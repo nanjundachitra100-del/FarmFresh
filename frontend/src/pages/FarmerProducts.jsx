@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Edit2, Trash2, Plus, X, Sprout, Tag, RefreshCw } from 'lucide-react';
+import { Edit2, Trash2, Plus, X, Sprout, Tag, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import './FarmerProducts.css';
 
@@ -14,12 +14,14 @@ const PRESET_IMAGES = [
 ];
 
 export const FarmerProducts = () => {
-  const { products, addProduct, updateProduct, deleteProduct } = useContext(AppContext);
+  const { products, addProduct, updateProduct, deleteProduct, currentUser } = useContext(AppContext);
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Filter products by farmer ID ('farm-1')
-  const farmerProducts = products.filter((p) => p.farmerId === 'farm-1');
+  // Filter products for this farmer (matching either current farmer id or default demo farmer)
+  const farmerProducts = products.filter(
+    (p) => p.farmerId === currentUser.id || p.farmerId === '00000000-0000-0000-0000-000000000001' || p.farmerId === 'farm-1'
+  );
 
   // Form states
   const [isEditing, setIsEditing] = useState(false);
@@ -32,6 +34,11 @@ export const FarmerProducts = () => {
   const [category, setCategory] = useState('Vegetables');
   const [imageUrl, setImageUrl] = useState(PRESET_IMAGES[0].url);
 
+  // UI feedback states
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
   // Check URL query parameters for ?edit=id (for card shortcut clicks)
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -41,10 +48,9 @@ export const FarmerProducts = () => {
       if (prodToEdit) {
         startEdit(prodToEdit);
       }
-      // Remove query param cleanly
       navigate('/farmer/products', { replace: true });
     }
-  }, [location.search]);
+  }, [location.search, products, navigate]);
 
   const resetForm = () => {
     setName('');
@@ -56,6 +62,7 @@ export const FarmerProducts = () => {
     setImageUrl(PRESET_IMAGES[0].url);
     setIsEditing(false);
     setEditingId(null);
+    setErrorMessage('');
   };
 
   const startEdit = (product) => {
@@ -68,34 +75,66 @@ export const FarmerProducts = () => {
     setImageUrl(product.image);
     setIsEditing(true);
     setEditingId(product.id);
+    setErrorMessage('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim() || !description.trim() || !price || !quantity) return;
+    if (!name.trim() || !description.trim() || !price || !quantity) {
+      setErrorMessage('Please fill in all required product fields.');
+      return;
+    }
+
+    if (parseFloat(price) < 0 || parseInt(quantity, 10) < 0) {
+      setErrorMessage('Price and available stock must be non-negative values.');
+      return;
+    }
 
     const productData = {
-      name,
-      description,
-      price,
-      quantity,
-      unit,
+      name: name.trim(),
+      description: description.trim(),
+      price: parseFloat(price),
+      quantity: parseInt(quantity, 10),
+      unit: unit.trim(),
       category,
       image: imageUrl
     };
 
-    if (isEditing) {
-      updateProduct(editingId, productData);
-    } else {
-      addProduct(productData);
-    }
+    setIsSubmitting(true);
+    setErrorMessage('');
+    setSuccessMessage('');
 
-    resetForm();
+    try {
+      if (isEditing) {
+        await updateProduct(editingId, productData);
+        setSuccessMessage('Product listing updated successfully in the catalog!');
+      } else {
+        await addProduct(productData);
+        setSuccessMessage('New farm product published to catalog successfully!');
+      }
+      resetForm();
+      setTimeout(() => setSuccessMessage(''), 4000);
+    } catch (err) {
+      setErrorMessage(err.message || 'Operation failed. Please check your connection to the database/API.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product listing from FarmFresh?')) {
-      deleteProduct(id);
+      setIsSubmitting(true);
+      setErrorMessage('');
+      try {
+        await deleteProduct(id);
+        setSuccessMessage('Product listing removed successfully.');
+        setTimeout(() => setSuccessMessage(''), 3000);
+      } catch (err) {
+        setErrorMessage(err.message || 'Failed to delete product from database.');
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -105,6 +144,23 @@ export const FarmerProducts = () => {
         <h1>Manage Farm Inventory</h1>
         <p>List new agricultural products, update stocks, or remove items from your public catalog.</p>
       </header>
+
+      {/* Global Status Alerts */}
+      {errorMessage && (
+        <div className="inventory-alert-box error" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: '#fef2f2', border: '1px solid #f87171', borderRadius: '8px', color: '#b91c1c', marginBottom: '20px' }}>
+          <AlertCircle size={20} />
+          <span><strong>Error:</strong> {errorMessage}</span>
+          <button onClick={() => setErrorMessage('')} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#b91c1c' }}>×</button>
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="inventory-alert-box success" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 16px', background: '#f0fdf4', border: '1px solid #4ade80', borderRadius: '8px', color: '#15803d', marginBottom: '20px' }}>
+          <CheckCircle size={20} />
+          <span>{successMessage}</span>
+          <button onClick={() => setSuccessMessage('')} style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#15803d' }}>×</button>
+        </div>
+      )}
 
       <div className="inventory-layout-grid">
         {/* Left Column: List Catalog */}
@@ -166,6 +222,7 @@ export const FarmerProducts = () => {
                             onClick={() => startEdit(prod)} 
                             className="action-icon-btn edit-color"
                             title="Edit product"
+                            disabled={isSubmitting}
                             id={`edit-btn-${prod.id}`}
                           >
                             <Edit2 size={16} />
@@ -174,6 +231,7 @@ export const FarmerProducts = () => {
                             onClick={() => handleDelete(prod.id)} 
                             className="action-icon-btn delete-color"
                             title="Delete product"
+                            disabled={isSubmitting}
                             id={`delete-btn-${prod.id}`}
                           >
                             <Trash2 size={16} />
@@ -198,7 +256,7 @@ export const FarmerProducts = () => {
           <div className="form-card-header">
             <h3>{isEditing ? 'Update Listing Details' : 'Add New Farm Product'}</h3>
             {isEditing && (
-              <button onClick={resetForm} className="cancel-edit-btn" title="Cancel edit">
+              <button onClick={resetForm} className="cancel-edit-btn" title="Cancel edit" type="button">
                 <X size={16} /> Cancel
               </button>
             )}
@@ -213,6 +271,7 @@ export const FarmerProducts = () => {
                 placeholder="e.g. Organic Heirloom Tomatoes"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                disabled={isSubmitting}
                 required
               />
             </div>
@@ -225,6 +284,7 @@ export const FarmerProducts = () => {
                 placeholder="Describe your harvest, farming methods, freshness..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
+                disabled={isSubmitting}
                 required
               ></textarea>
             </div>
@@ -241,6 +301,7 @@ export const FarmerProducts = () => {
                   placeholder="4.99"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
+                  disabled={isSubmitting}
                   required
                 />
               </div>
@@ -251,6 +312,7 @@ export const FarmerProducts = () => {
                   id="prod-unit-select"
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
+                  disabled={isSubmitting}
                 >
                   <option value="lb">lb (Pound)</option>
                   <option value="oz">oz (Ounce)</option>
@@ -273,6 +335,7 @@ export const FarmerProducts = () => {
                   placeholder="50"
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
+                  disabled={isSubmitting}
                   required
                 />
               </div>
@@ -283,6 +346,7 @@ export const FarmerProducts = () => {
                   id="prod-cat-select"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
+                  disabled={isSubmitting}
                 >
                   <option value="Vegetables">Vegetables</option>
                   <option value="Fruits">Fruits</option>
@@ -315,11 +379,17 @@ export const FarmerProducts = () => {
                 placeholder="Or paste custom image HTTPS URL..."
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
+                disabled={isSubmitting}
               />
             </div>
 
-            <button type="submit" className="submit-inventory-btn" id="prod-submit-btn">
-              {isEditing ? (
+            <button type="submit" className="submit-inventory-btn" id="prod-submit-btn" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <RefreshCw size={18} className="animate-spin" />
+                  <span>Saving to Database...</span>
+                </>
+              ) : isEditing ? (
                 <>
                   <RefreshCw size={18} />
                   <span>Update Catalog Listing</span>

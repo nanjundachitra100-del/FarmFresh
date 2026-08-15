@@ -1,8 +1,9 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
+import { productService } from '../services/productService';
 
 export const AppContext = createContext();
 
-// Seed data
+// Initial preview / seed data for UI dev before first cloud load
 const initialProducts = [
   {
     id: 'prod-1',
@@ -13,7 +14,7 @@ const initialProducts = [
     quantity: 45,
     category: 'Vegetables',
     image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&q=80&w=600',
-    farmerId: 'farm-1',
+    farmerId: '00000000-0000-0000-0000-000000000001',
     farmerName: 'Green Valley Organic Farms',
     rating: 4.8,
     reviewsCount: 12
@@ -27,7 +28,7 @@ const initialProducts = [
     quantity: 120,
     category: 'Fruits',
     image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&q=80&w=600',
-    farmerId: 'farm-2',
+    farmerId: '00000000-0000-0000-0000-000000000002',
     farmerName: 'Sunny Ridge Orchards',
     rating: 4.9,
     reviewsCount: 24
@@ -41,7 +42,7 @@ const initialProducts = [
     quantity: 30,
     category: 'Honey & Preserves',
     image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&q=80&w=600',
-    farmerId: 'farm-1',
+    farmerId: '00000000-0000-0000-0000-000000000001',
     farmerName: 'Green Valley Organic Farms',
     rating: 4.7,
     reviewsCount: 8
@@ -55,7 +56,7 @@ const initialProducts = [
     quantity: 18,
     category: 'Dairy & Eggs',
     image: 'https://images.unsplash.com/photo-1516448620398-c5f44bf9f441?auto=format&fit=crop&q=80&w=600',
-    farmerId: 'farm-3',
+    farmerId: '00000000-0000-0000-0000-000000000003',
     farmerName: 'Oakwood Pastures',
     rating: 5.0,
     reviewsCount: 19
@@ -69,7 +70,7 @@ const initialProducts = [
     quantity: 25,
     category: 'Dairy & Eggs',
     image: 'https://images.unsplash.com/photo-1486887396153-fa416525c108?auto=format&fit=crop&q=80&w=600',
-    farmerId: 'farm-3',
+    farmerId: '00000000-0000-0000-0000-000000000003',
     farmerName: 'Oakwood Pastures',
     rating: 4.6,
     reviewsCount: 6
@@ -83,7 +84,7 @@ const initialProducts = [
     quantity: 40,
     category: 'Vegetables',
     image: 'https://images.unsplash.com/photo-1589135799797-df004122cc77?auto=format&fit=crop&q=80&w=600',
-    farmerId: 'farm-1',
+    farmerId: '00000000-0000-0000-0000-000000000001',
     farmerName: 'Green Valley Organic Farms',
     rating: 4.5,
     reviewsCount: 4
@@ -165,10 +166,9 @@ const initialReviews = [
 ];
 
 export const AppProvider = ({ children }) => {
-  const [products, setProducts] = useState(() => {
-    const saved = localStorage.getItem('farmfresh_products');
-    return saved ? JSON.parse(saved) : initialProducts;
-  });
+  const [products, setProducts] = useState(initialProducts);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [productError, setProductError] = useState(null);
 
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('farmfresh_orders');
@@ -182,17 +182,34 @@ export const AppProvider = ({ children }) => {
 
   // Current user role switcher (for previewing the app features)
   const [currentUser, setCurrentUser] = useState({
-    id: 'user-1',
+    id: '00000000-0000-0000-0000-000000000001',
     name: 'Sarah Jenkins',
     email: 'sarah@example.com',
     role: 'customer' // 'customer', 'farmer', or 'admin'
   });
 
-  // Persist state in localStorage
-  useEffect(() => {
-    localStorage.setItem('farmfresh_products', JSON.stringify(products));
-  }, [products]);
+  // Fetch products from backend API (Source of Truth)
+  const loadProducts = useCallback(async (filters = {}) => {
+    setLoadingProducts(true);
+    setProductError(null);
+    try {
+      const data = await productService.getProducts(filters);
+      if (Array.isArray(data) && data.length > 0) {
+        setProducts(data);
+      }
+    } catch (err) {
+      console.warn('[AppContext] Could not fetch products from backend API:', err.message);
+      setProductError(err.message);
+    } finally {
+      setLoadingProducts(false);
+    }
+  }, []);
 
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
+
+  // Persist state in localStorage
   useEffect(() => {
     localStorage.setItem('farmfresh_orders', JSON.stringify(orders));
   }, [orders]);
@@ -201,28 +218,29 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem('farmfresh_reviews', JSON.stringify(reviews));
   }, [reviews]);
 
-  // Product actions
-  const addProduct = (productData) => {
-    const newProduct = {
-      id: `prod-${Date.now()}`,
-      farmerId: 'farm-1', // Mocking current farmer ID
-      farmerName: 'Green Valley Organic Farms', // Mocking current farmer Name
-      rating: 5.0,
-      reviewsCount: 0,
+  // Product actions - Strictly backed by API (Source of Truth)
+  const addProduct = async (productData) => {
+    const payload = {
       ...productData,
-      price: parseFloat(productData.price),
-      quantity: parseInt(productData.quantity)
+      farmerId: currentUser.role === 'farmer' ? currentUser.id : '00000000-0000-0000-0000-000000000001'
     };
-    setProducts((prev) => [newProduct, ...prev]);
+
+    // Make database/API call
+    const created = await productService.createProduct(payload);
+    setProducts((prev) => [created, ...prev]);
+    return created;
   };
 
-  const updateProduct = (id, updatedData) => {
+  const updateProduct = async (id, updatedData) => {
+    const updated = await productService.updateProduct(id, updatedData);
     setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, ...updatedData, price: parseFloat(updatedData.price), quantity: parseInt(updatedData.quantity) } : p))
+      prev.map((p) => (p.id === id ? { ...p, ...updated } : p))
     );
+    return updated;
   };
 
-  const deleteProduct = (id) => {
+  const deleteProduct = async (id) => {
+    await productService.deleteProduct(id);
     setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
@@ -234,13 +252,13 @@ export const AppProvider = ({ children }) => {
       customerName: currentUser.name,
       date: new Date().toISOString(),
       status: 'Pending',
-      paymentStatus: 'Paid', // Pre-confirming since we skip x402 payment flow implementation for this phase
+      paymentStatus: 'Paid',
       paymentMethod: 'x402 Protocol',
       ...orderData
     };
     setOrders((prev) => [newOrder, ...prev]);
     
-    // Deduct quantities from products
+    // Deduct quantities from products locally for cart checkout
     orderData.items.forEach(item => {
       setProducts(prevProducts => 
         prevProducts.map(p => {
@@ -316,6 +334,9 @@ export const AppProvider = ({ children }) => {
     <AppContext.Provider
       value={{
         products,
+        loadingProducts,
+        productError,
+        loadProducts,
         orders,
         reviews,
         currentUser,

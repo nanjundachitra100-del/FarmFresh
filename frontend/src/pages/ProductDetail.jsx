@@ -1,9 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart, Calendar, User, Star } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Calendar, User, Star, Sprout, MapPin } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { CartContext } from '../context/CartContext';
 import { RatingStars } from '../components/RatingStars';
+import { productService } from '../services/productService';
 import './ProductDetail.css';
 
 export const ProductDetail = () => {
@@ -11,13 +12,39 @@ export const ProductDetail = () => {
   const { products, reviews, addReview, currentUser } = useContext(AppContext);
   const { addToCart } = useContext(CartContext);
 
+  const [fetchedProduct, setFetchedProduct] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [qtyToOrder, setQtyToOrder] = useState(1);
   const [userRating, setUserRating] = useState(5);
   const [userComment, setUserComment] = useState('');
   const [reviewMessage, setReviewMessage] = useState('');
 
-  // Find product
-  const product = products.find((p) => p.id === id);
+  // Find product from AppContext or fetch from API
+  const localProduct = products.find((p) => p.id === id);
+  const product = localProduct || fetchedProduct;
+
+  useEffect(() => {
+    if (!localProduct && id) {
+      setLoading(true);
+      productService
+        .getProductById(id)
+        .then((data) => {
+          if (data) setFetchedProduct(data);
+        })
+        .catch((err) => {
+          console.warn('[ProductDetail] Could not load from API:', err.message);
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [id, localProduct]);
+
+  if (loading) {
+    return (
+      <div className="product-detail-page" style={{ textAlign: 'center', padding: '100px 20px' }}>
+        <h3>Loading Product Details...</h3>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -81,10 +108,13 @@ export const ProductDetail = () => {
         {/* Right column - Info */}
         <div className="detail-info-card">
           <div className="detail-header">
-            <span className="detail-farmer-name">{product.farmerName}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
+              <Sprout size={16} color="var(--primary)" />
+              <span className="detail-farmer-name">{product.farmerName}</span>
+            </div>
             <h1>{product.name}</h1>
             <div className="detail-rating-row">
-              <RatingStars rating={product.rating} count={productReviews.length} />
+              <RatingStars rating={product.rating || 5.0} count={productReviews.length} />
             </div>
           </div>
 
@@ -143,8 +173,8 @@ export const ProductDetail = () => {
 
           {currentUser.role === 'farmer' && (
             <div className="farmer-admin-actions">
-              <Link to="/farmer/products" className="manage-catalog-btn">
-                Manage Inventory Catalog
+              <Link to={`/farmer/products?edit=${product.id}`} className="manage-catalog-btn">
+                Manage This Harvest
               </Link>
             </div>
           )}
