@@ -1,0 +1,13 @@
+/* Global Application Resets (Vite Boilerplate Overwrite) */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-main);
+  color: var(--text-dark);
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
