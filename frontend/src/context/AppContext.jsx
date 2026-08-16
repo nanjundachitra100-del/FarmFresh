@@ -194,8 +194,12 @@ export const AppProvider = ({ children }) => {
     setProductError(null);
     try {
       const data = await productService.getProducts(filters);
-      if (Array.isArray(data) && data.length > 0) {
+      // Use API data as the source of truth. If the backend returns an empty array,
+      // reflect that in the UI (do not silently keep local preview data).
+      if (Array.isArray(data)) {
         setProducts(data);
+      } else {
+        setProducts([]);
       }
     } catch (err) {
       console.warn('[AppContext] Could not fetch products from backend API:', err.message);

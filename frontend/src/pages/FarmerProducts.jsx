@@ -33,6 +33,8 @@ export const FarmerProducts = () => {
   const [unit, setUnit] = useState('lb');
   const [category, setCategory] = useState('Vegetables');
   const [imageUrl, setImageUrl] = useState(PRESET_IMAGES[0].url);
+  const [imageFile, setImageFile] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // UI feedback states
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -381,6 +383,46 @@ export const FarmerProducts = () => {
                 onChange={(e) => setImageUrl(e.target.value)}
                 disabled={isSubmitting}
               />
+
+              <div style={{ marginTop: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '6px' }}>Or upload image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImageFile(e.target.files && e.target.files[0])}
+                  disabled={isSubmitting || uploadingImage}
+                />
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!imageFile) return setErrorMessage('Select an image file to upload.');
+                    setUploadingImage(true);
+                    setErrorMessage('');
+                    try {
+                      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+                      const form = new FormData();
+                      form.append('image', imageFile);
+                      const resp = await fetch(`${API_URL}/api/products/upload-image`, {
+                        method: 'POST',
+                        body: form
+                      });
+                      const body = await resp.json();
+                      if (!resp.ok) throw new Error(body.error || 'Image upload failed');
+                      setImageUrl(body.url || '');
+                      setSuccessMessage('Image uploaded and selected for product.');
+                      setTimeout(() => setSuccessMessage(''), 3000);
+                    } catch (err) {
+                      setErrorMessage(err.message || 'Image upload failed.');
+                    } finally {
+                      setUploadingImage(false);
+                    }
+                  }}
+                  disabled={isSubmitting || uploadingImage}
+                  style={{ marginLeft: '8px' }}
+                >
+                  {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                </button>
+              </div>
             </div>
 
             <button type="submit" className="submit-inventory-btn" id="prod-submit-btn" disabled={isSubmitting}>

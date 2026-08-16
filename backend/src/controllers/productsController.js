@@ -77,8 +77,12 @@ async function getProducts(req, res) {
       query = query.gt('quantity', 0);
     }
 
-    if (search && search.trim()) {
-      query = query.or(`name.ilike.%${search.trim()}%,description.ilike.%${search.trim()}%`);
+    const s = search && search.trim() ? search.trim() : null;
+    if (s) {
+      // Search product name or description on the DB side. Farmer name
+      // is joined and filtered in-memory after fetching to avoid complex
+      // relational .or parsing issues on Supabase.
+      query = query.or(`name.ilike.%${s}%,description.ilike.%${s}%`);
     }
 
     // Apply sorting
@@ -102,7 +106,32 @@ async function getProducts(req, res) {
       .from('reviews')
       .select('product_id, rating');
 
-    const formatted = (productsData || []).map((p) => formatProduct(p, reviewsData || []));
+    let formatted = (productsData || []).map((p) => formatProduct(p, reviewsData || []));
+
+    // If search term provided, also include products where farmer name matches.
+    // If DB-side name/description search returned nothing, fall back to fetching
+    // all products and filtering by farmer name to support farmer-name-only searches.
+    if (s) {
+      const lower = s.toLowerCase();
+      formatted = formatted.filter((fp) => {
+        return (
+          fp.name.toLowerCase().includes(lower) ||
+          fp.description.toLowerCase().includes(lower) ||
+          (fp.farmerName && fp.farmerName.toLowerCase().includes(lower))
+        );
+      });
+
+      if (formatted.length === 0) {
+        // Fetch all products and filter by farmer name
+        const { data: allProductsData } = await supabaseAdmin
+          .from('products')
+          .select('*, profiles:farmer_id (id, full_name, farm_name)')
+          .order('created_at', { ascending: false });
+
+        const allFormatted = (allProductsData || []).map((p) => formatProduct(p, reviewsData || []));
+        formatted = allFormatted.filter((fp) => fp.farmerName && fp.farmerName.toLowerCase().includes(lower));
+      }
+    }
 
     // Sort by rating if requested
     if (sortBy === 'rating') {
@@ -343,3 +372,44 @@ module.exports = {
   updateProduct,
   deleteProduct
 };
+
+// 6. POST /api/products/upload-image - Upload product image to Supabase storage
+async function uploadProductImage(req, res) {
+  if (!isSupabaseConfigured()) {
+    return res.status(503).json({ error: 'Database/storage service is unavailable. Cannot upload image.' });
+  }
+
+  try {
+    // multer sets file on req.file (memoryStorage)
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ error: 'No image file provided.' });
+    }
+
+    const bucket = 'product-images';
+    const filename = `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+
+    const { data: uploadData, error: uploadError } = await supabaseAdmin.storage
+      .from(bucket)
+      .upload(filename, file.buffer, { contentType: file.mimetype, upsert: false });
+
+    if (uploadError) {
+      return res.status(500).json({ error: `Image upload failed: ${uploadError.message}` });
+    }
+
+    // Get public URL
+    const { data: publicData } = supabaseAdmin.storage.from(bucket).getPublicUrl(uploadData.path || filename);
+    const publicUrl = (publicData && publicData.publicUrl) ? publicData.publicUrl : null;
+
+    if (!publicUrl) {
+      return res.status(500).json({ error: 'Could not determine public URL for uploaded image.' });
+    }
+
+    return res.status(201).json({ success: true, url: publicUrl });
+  } catch (err) {
+    return res.status(500).json({ error: err.message || 'Internal Server Error' });
+  }
+}
+
+module.exports.uploadProductImage = uploadProductImage;
+
