@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { productService } from '../services/productService';
+import { KNOWN_FARMER_ID } from '../constants/demoIds';
 
 export const AppContext = createContext();
 
@@ -224,13 +225,17 @@ export const AppProvider = ({ children }) => {
 
   // Product actions - Strictly backed by API (Source of Truth)
   const addProduct = async (productData) => {
+    // Ensure product created on behalf of the authenticated farmer uses the correct profile id.
+    // Use centralized KNOWN_FARMER_ID when the current user is a farmer (demo-only).
+    const headerUserId = currentUser.role === 'farmer' ? KNOWN_FARMER_ID : currentUser.id;
+
     const payload = {
       ...productData,
-      farmerId: currentUser.role === 'farmer' ? currentUser.id : '00000000-0000-0000-0000-000000000001'
+      farmerId: currentUser.role === 'farmer' ? KNOWN_FARMER_ID : '00000000-0000-0000-0000-000000000001'
     };
 
-    // Make database/API call
-    const created = await productService.createProduct(payload);
+    // Make database/API call. Send current user's id in a header so backend can use authenticated farmer id.
+    const created = await productService.createProduct(payload, { 'X-User-Id': headerUserId });
     setProducts((prev) => [created, ...prev]);
     return created;
   };

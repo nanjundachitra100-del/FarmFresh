@@ -1,14 +1,15 @@
 import React, { useContext } from 'react';
 import { ShoppingBag, Calendar, MapPin, CheckCircle2, Clock, Truck, ClipboardList } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
+import { ALL_DEMO_FARM_IDS } from '../constants/demoIds';
 import './FarmerOrders.css';
 
 export const FarmerOrders = () => {
   const { orders, products, updateOrderStatus } = useContext(AppContext);
 
-  // Filter products belonging to this farmer ('farm-1')
+  // Filter products belonging to this demo farmer (include legacy demo ids and known UUID)
   const farmerProductIds = products
-    .filter((p) => p.farmerId === 'farm-1')
+    .filter((p) => ALL_DEMO_FARM_IDS.includes(p.farmerId))
     .map((p) => p.id);
 
   // Filter orders that have items from this farmer

@@ -4,6 +4,7 @@ import { Sprout, ShoppingCart, User, ChevronDown, Sliders } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { CartContext } from '../context/CartContext';
 import './Navbar.css';
+import { KNOWN_FARMER_ID } from '../constants/demoIds';
 
 export const Navbar = () => {
   const { currentUser, setCurrentUser } = useContext(AppContext);
@@ -20,7 +21,7 @@ export const Navbar = () => {
     if (role === 'farmer') {
       name = 'Green Valley Farms';
       email = 'farmer@greenvalley.com';
-      id = 'farm-1';
+      id = KNOWN_FARMER_ID;
     } else if (role === 'admin') {
       name = 'Admin Console';
       email = 'admin@farmfresh.com';

@@ -2,14 +2,15 @@ import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { DollarSign, ShoppingBag, Sprout, Star, ArrowUpRight, TrendingUp } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
+import { ALL_DEMO_FARM_IDS } from '../constants/demoIds';
 import { RatingStars } from '../components/RatingStars';
 import './FarmerDashboard.css';
 
 export const FarmerDashboard = () => {
   const { products, orders, reviews } = useContext(AppContext);
 
-  // Filter products by farmer ID ('farm-1')
-  const farmerProducts = products.filter((p) => p.farmerId === 'farm-1');
+  // Filter products belonging to this demo farmer (include legacy demo ids and known UUID)
+  const farmerProducts = products.filter((p) => ALL_DEMO_FARM_IDS.includes(p.farmerId));
   
   // Filter reviews belonging to farmer's products
   const farmerProductIds = farmerProducts.map((p) => p.id);

@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Edit2, Trash2, Plus, X, Sprout, Tag, RefreshCw, AlertCircle, CheckCircle } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
+import { ALL_DEMO_FARM_IDS } from '../constants/demoIds';
 import './FarmerProducts.css';
 
 const PRESET_IMAGES = [
@@ -18,10 +19,8 @@ export const FarmerProducts = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Filter products for this farmer (matching either current farmer id or default demo farmer)
-  const farmerProducts = products.filter(
-    (p) => p.farmerId === currentUser.id || p.farmerId === '00000000-0000-0000-0000-000000000001' || p.farmerId === 'farm-1'
-  );
+  // Filter products for this farmer (matching either current farmer id or known demo farmer ids)
+  const farmerProducts = products.filter((p) => p.farmerId === currentUser.id || ALL_DEMO_FARM_IDS.includes(p.farmerId));
 
   // Form states
   const [isEditing, setIsEditing] = useState(false);
