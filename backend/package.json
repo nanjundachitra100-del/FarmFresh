@@ -13,10 +13,26 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+<<<<<<< ours
     "@supabase/supabase-js": "^2.49.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.2.1",
     "multer": "^1.4.5-lts.1"
+||||||| base
+    "@supabase/supabase-js": "^2.49.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^5.2.1"
+=======
+    "@supabase/supabase-js": "^2.112.3",
+    "@x402/avm": "^2.22.0",
+    "@x402/core": "^2.22.0",
+    "@x402/express": "^2.22.0",
+    "algosdk": "^3.6.0",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^5.2.1"
+>>>>>>> theirs
   }
 }

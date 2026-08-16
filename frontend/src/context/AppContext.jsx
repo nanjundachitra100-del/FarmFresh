@@ -1,10 +1,9 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import { productService } from '../services/productService';
-import { KNOWN_FARMER_ID } from '../constants/demoIds';
+import React, { createContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 export const AppContext = createContext();
 
-// Initial preview / seed data for UI dev before first cloud load
+// Seed data
 const initialProducts = [
   {
     id: 'prod-1',
@@ -15,7 +14,7 @@ const initialProducts = [
     quantity: 45,
     category: 'Vegetables',
     image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&q=80&w=600',
-    farmerId: '00000000-0000-0000-0000-000000000001',
+    farmerId: 'farm-1',
     farmerName: 'Green Valley Organic Farms',
     rating: 4.8,
     reviewsCount: 12
@@ -29,7 +28,7 @@ const initialProducts = [
     quantity: 120,
     category: 'Fruits',
     image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&q=80&w=600',
-    farmerId: '00000000-0000-0000-0000-000000000002',
+    farmerId: 'farm-2',
     farmerName: 'Sunny Ridge Orchards',
     rating: 4.9,
     reviewsCount: 24
@@ -43,7 +42,7 @@ const initialProducts = [
     quantity: 30,
     category: 'Honey & Preserves',
     image: 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&q=80&w=600',
-    farmerId: '00000000-0000-0000-0000-000000000001',
+    farmerId: 'farm-1',
     farmerName: 'Green Valley Organic Farms',
     rating: 4.7,
     reviewsCount: 8
@@ -57,7 +56,7 @@ const initialProducts = [
     quantity: 18,
     category: 'Dairy & Eggs',
     image: 'https://images.unsplash.com/photo-1516448620398-c5f44bf9f441?auto=format&fit=crop&q=80&w=600',
-    farmerId: '00000000-0000-0000-0000-000000000003',
+    farmerId: 'farm-3',
     farmerName: 'Oakwood Pastures',
     rating: 5.0,
     reviewsCount: 19
@@ -71,7 +70,7 @@ const initialProducts = [
     quantity: 25,
     category: 'Dairy & Eggs',
     image: 'https://images.unsplash.com/photo-1486887396153-fa416525c108?auto=format&fit=crop&q=80&w=600',
-    farmerId: '00000000-0000-0000-0000-000000000003',
+    farmerId: 'farm-3',
     farmerName: 'Oakwood Pastures',
     rating: 4.6,
     reviewsCount: 6
@@ -85,7 +84,7 @@ const initialProducts = [
     quantity: 40,
     category: 'Vegetables',
     image: 'https://images.unsplash.com/photo-1589135799797-df004122cc77?auto=format&fit=crop&q=80&w=600',
-    farmerId: '00000000-0000-0000-0000-000000000001',
+    farmerId: 'farm-1',
     farmerName: 'Green Valley Organic Farms',
     rating: 4.5,
     reviewsCount: 4
@@ -166,10 +165,45 @@ const initialReviews = [
   }
 ];
 
+const normalizeSupabaseProduct = (product) => ({
+  id: product.id,
+  farmerId: product.farmer_id || product.farmerId || 'farm-1',
+  farmerName: product.farmer_name || product.farmerName || 'Local Farmer',
+  name: product.name,
+  description: product.description || '',
+  price: Number(product.price ?? 0),
+  unit: product.unit || 'lb',
+  category: product.category || 'Vegetables',
+  quantity: Number(product.quantity ?? 0),
+  image: product.image_url || product.image || '',
+  rating: Number(product.rating ?? 5.0),
+  reviewsCount: Number(product.reviews_count ?? 0)
+});
+
 export const AppProvider = ({ children }) => {
-  const [products, setProducts] = useState(initialProducts);
-  const [loadingProducts, setLoadingProducts] = useState(false);
-  const [productError, setProductError] = useState(null);
+  const [products, setProducts] = useState(() => {
+    const saved = localStorage.getItem('farmfresh_products');
+    return saved ? JSON.parse(saved) : initialProducts;
+  });
+
+  const normalizeOrder = (order, fallbackCustomerName = 'Customer') => ({
+    id: order.id,
+    date: order.created_at || order.date || new Date().toISOString(),
+    customerId: order.customer_id || order.customerId || currentUser?.id,
+    customerName: order.customer_name || order.customerName || fallbackCustomerName,
+    deliveryAddress: order.delivery_address || order.deliveryAddress || '',
+    status: order.status || 'Pending',
+    paymentStatus: order.payment_status || order.paymentStatus || 'Paid',
+    paymentMethod: order.payment_method || order.paymentMethod || 'x402 Protocol',
+    totalAmount: Number(order.total_amount ?? order.totalAmount ?? 0),
+    items: (order.items || []).map((item) => ({
+      productId: item.product_id || item.productId,
+      name: item.name || 'Product',
+      price: Number(item.price ?? 0),
+      quantity: Number(item.quantity ?? 1),
+      unit: item.unit || ''
+    }))
+  });
 
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('farmfresh_orders');
@@ -181,40 +215,68 @@ export const AppProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : initialReviews;
   });
 
+  useEffect(() => {
+    if (!supabase) return;
+
+    let isMounted = true;
+
+    const hydrateSupabaseContext = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (session?.user) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+          if (!profileError && profile && isMounted) {
+            setCurrentUser({
+              id: profile.id,
+              name: profile.full_name || session.user.email || 'FarmFresh User',
+              email: session.user.email || '',
+              role: profile.role || 'customer'
+            });
+          }
+        }
+
+        const { data: supabaseProducts, error: productsError } = await supabase
+          .from('products')
+          .select('id, farmer_id, name, description, price, unit, category, quantity, image_url');
+
+        if (productsError) {
+          console.error('Failed to load Supabase products:', productsError.message);
+          return;
+        }
+
+        if (supabaseProducts && supabaseProducts.length > 0 && isMounted) {
+          const mappedProducts = supabaseProducts.map(normalizeSupabaseProduct);
+          setProducts(mappedProducts);
+          localStorage.setItem('farmfresh_products', JSON.stringify(mappedProducts));
+        }
+      } catch (error) {
+        console.error('Supabase hydration failed:', error);
+      }
+    };
+
+    hydrateSupabaseContext();
+    return () => { isMounted = false; };
+  }, []);
+
   // Current user role switcher (for previewing the app features)
   const [currentUser, setCurrentUser] = useState({
-    id: '00000000-0000-0000-0000-000000000001',
+    id: 'user-1',
     name: 'Sarah Jenkins',
     email: 'sarah@example.com',
     role: 'customer' // 'customer', 'farmer', or 'admin'
   });
 
-  // Fetch products from backend API (Source of Truth)
-  const loadProducts = useCallback(async (filters = {}) => {
-    setLoadingProducts(true);
-    setProductError(null);
-    try {
-      const data = await productService.getProducts(filters);
-      // Use API data as the source of truth. If the backend returns an empty array,
-      // reflect that in the UI (do not silently keep local preview data).
-      if (Array.isArray(data)) {
-        setProducts(data);
-      } else {
-        setProducts([]);
-      }
-    } catch (err) {
-      console.warn('[AppContext] Could not fetch products from backend API:', err.message);
-      setProductError(err.message);
-    } finally {
-      setLoadingProducts(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadProducts();
-  }, [loadProducts]);
-
   // Persist state in localStorage
+  useEffect(() => {
+    localStorage.setItem('farmfresh_products', JSON.stringify(products));
+  }, [products]);
+
   useEffect(() => {
     localStorage.setItem('farmfresh_orders', JSON.stringify(orders));
   }, [orders]);
@@ -223,69 +285,120 @@ export const AppProvider = ({ children }) => {
     localStorage.setItem('farmfresh_reviews', JSON.stringify(reviews));
   }, [reviews]);
 
-  // Product actions - Strictly backed by API (Source of Truth)
-  const addProduct = async (productData) => {
-    // Ensure product created on behalf of the authenticated farmer uses the correct profile id.
-    // Use centralized KNOWN_FARMER_ID when the current user is a farmer (demo-only).
-    const headerUserId = currentUser.role === 'farmer' ? KNOWN_FARMER_ID : currentUser.id;
-
-    const payload = {
+  // Product actions
+  const addProduct = (productData) => {
+    const newProduct = {
+      id: `prod-${Date.now()}`,
+      farmerId: 'farm-1', // Mocking current farmer ID
+      farmerName: 'Green Valley Organic Farms', // Mocking current farmer Name
+      rating: 5.0,
+      reviewsCount: 0,
       ...productData,
-      farmerId: currentUser.role === 'farmer' ? KNOWN_FARMER_ID : '00000000-0000-0000-0000-000000000001'
+      price: parseFloat(productData.price),
+      quantity: parseInt(productData.quantity)
     };
-
-    // Make database/API call. Send current user's id in a header so backend can use authenticated farmer id.
-    const created = await productService.createProduct(payload, { 'X-User-Id': headerUserId });
-    setProducts((prev) => [created, ...prev]);
-    return created;
+    setProducts((prev) => [newProduct, ...prev]);
   };
 
-  const updateProduct = async (id, updatedData) => {
-    const updated = await productService.updateProduct(id, updatedData);
+  const updateProduct = (id, updatedData) => {
     setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, ...updated } : p))
+      prev.map((p) => (p.id === id ? { ...p, ...updatedData, price: parseFloat(updatedData.price), quantity: parseInt(updatedData.quantity) } : p))
     );
-    return updated;
   };
 
-  const deleteProduct = async (id) => {
-    await productService.deleteProduct(id);
+  const deleteProduct = (id) => {
     setProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
   // Order actions
-  const addOrder = (orderData) => {
-    const newOrder = {
-      id: `ord-${Math.floor(100 + Math.random() * 900)}`,
-      customerId: currentUser.id,
-      customerName: currentUser.name,
-      date: new Date().toISOString(),
-      status: 'Pending',
-      paymentStatus: 'Paid',
-      paymentMethod: 'x402 Protocol',
-      ...orderData
-    };
-    setOrders((prev) => [newOrder, ...prev]);
-    
-    // Deduct quantities from products locally for cart checkout
-    orderData.items.forEach(item => {
-      setProducts(prevProducts => 
-        prevProducts.map(p => {
-          if (p.id === item.productId) {
-            return { ...p, quantity: Math.max(0, p.quantity - item.quantity) };
-          }
-          return p;
-        })
-      );
-    });
+  const addOrder = async (orderData, { paymentFetch } = {}) => {
+    const isDemoId = ['user-1', 'cust-1', 'farm-1', 'admin-1'].includes(currentUser?.id);
 
-    return newOrder;
+    if (!currentUser?.id || isDemoId) {
+      throw new Error('Please log in to place an order.');
+    }
+
+    const payload = {
+      customerId: currentUser?.id,
+      ordersName: orderData.ordersName || `Order by ${currentUser?.name || 'Customer'}`,
+      deliveryAddress: orderData.deliveryAddress || '',
+      contactPlace: orderData.contactPlace || '',
+      paymentMethod: orderData.paymentMethod || 'x402 Protocol (Algorand)',
+      items: (orderData.items || []).map((item) => ({
+        productId: item.productId,
+        quantity: Number(item.quantity ?? 1)
+      }))
+    };
+
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const doFetch = paymentFetch || fetch;
+
+    try {
+      const response = await doFetch(`${apiUrl}/api/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result?.error || 'Unable to place order');
+      }
+
+      const createdOrder = normalizeOrder(result.order, currentUser?.name || 'Customer');
+
+      setOrders((prev) => [createdOrder, ...prev]);
+      localStorage.setItem('farmfresh_orders', JSON.stringify([createdOrder, ...orders]));
+
+      // Deduct quantities from products
+      (orderData.items || []).forEach((item) => {
+        setProducts((prevProducts) =>
+          prevProducts.map((p) => {
+            if (p.id === item.productId) {
+              return { ...p, quantity: Math.max(0, p.quantity - Number(item.quantity ?? 1)) };
+            }
+            return p;
+          })
+        );
+      });
+
+      return createdOrder;
+    } catch (error) {
+      console.error('Add order failed:', error);
+      throw error;
+    }
   };
 
-  const updateOrderStatus = (id, status) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === id ? { ...o, status } : o))
-    );
+  const updateOrderStatus = async (id, status) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/orders/${id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result?.error || 'Unable to update order status');
+      }
+
+      const updatedOrder = normalizeOrder(result.order, currentUser?.name || 'Customer');
+      setOrders((prev) =>
+        prev.map((o) => (o.id === id ? { ...o, ...updatedOrder } : o))
+      );
+      localStorage.setItem('farmfresh_orders', JSON.stringify(orders.map((o) => (o.id === id ? { ...o, ...updatedOrder } : o))));
+
+      return updatedOrder;
+    } catch (error) {
+      console.error('Update order status failed:', error);
+      throw error;
+    }
   };
 
   // Review actions
@@ -343,9 +456,6 @@ export const AppProvider = ({ children }) => {
     <AppContext.Provider
       value={{
         products,
-        loadingProducts,
-        productError,
-        loadProducts,
         orders,
         reviews,
         currentUser,

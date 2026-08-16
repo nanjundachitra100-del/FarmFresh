@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { WalletProvider } from '@txnlab/use-wallet-react';
+import { walletManager } from './lib/walletManager';
 import { AppProvider } from './context/AppContext';
 import { CartProvider } from './context/CartContext';
 import { Navbar } from './components/Navbar';
@@ -22,9 +24,10 @@ import './App.css';
 
 function App() {
   return (
-    <AppProvider>
-      <CartProvider>
-        <Router>
+    <WalletProvider manager={walletManager}>
+      <AppProvider>
+        <CartProvider>
+          <Router>
           <div className="app-layout" id="farmfresh-app-layout">
             <Navbar />
             
@@ -50,8 +53,9 @@ function App() {
             <Footer />
           </div>
         </Router>
-      </CartProvider>
-    </AppProvider>
+        </CartProvider>
+      </AppProvider>
+    </WalletProvider>
   );
 }
 

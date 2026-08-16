@@ -1,0 +1,13 @@
+HTTP/1.1 400 Bad Request
+X-Powered-By: Express
+Vary: Origin
+Access-Control-Allow-Credentials: true
+Access-Control-Expose-Headers: PAYMENT-RESPONSE,X-PAYMENT-RESPONSE,PAYMENT-REQUIRED,X-PAYMENT-REQUIRED,PAYMENT-SIGNATURE,X-PAYMENT
+Content-Security-Policy: default-src 'none'
+X-Content-Type-Options: nosniff
+Content-Type: text/html; charset=utf-8
+Content-Length: 1228
+Date: Sun, 16 Aug 2026 14:56:02 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
