@@ -8,7 +8,8 @@ import './ProductCard.css';
 
 export const ProductCard = ({ product }) => {
   const { addToCart } = useContext(CartContext);
-  const { currentUser } = useContext(AppContext);
+  const { currentUser } = useContext(AppContext) || {};
+  const userRole = currentUser?.role;
 
   const { id, name, category, price, unit, quantity, image, farmerName, rating, reviewsCount } = product;
   const isOutOfStock = quantity === 0;
@@ -54,7 +55,7 @@ export const ProductCard = ({ product }) => {
             <span className="price-unit">/ {unit}</span>
           </div>
 
-          {currentUser.role === 'customer' && (
+          {userRole === 'customer' && (
             <button
               onClick={() => addToCart(product, 1)}
               disabled={isOutOfStock}
@@ -66,7 +67,7 @@ export const ProductCard = ({ product }) => {
             </button>
           )}
 
-          {currentUser.role === 'farmer' && (
+          {userRole === 'farmer' && (
             <Link to={`/farmer/products?edit=${id}`} className="edit-shortcut-btn">
               Manage
             </Link>
