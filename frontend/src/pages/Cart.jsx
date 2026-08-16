@@ -1,21 +1,47 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Trash2, ShoppingBag, ArrowRight, MapPin, CreditCard } from 'lucide-react';
+import { useWallet } from '@txnlab/use-wallet-react';
 import { CartContext } from '../context/CartContext';
 import { AppContext } from '../context/AppContext';
+import { createPaymentFetch } from '../lib/x402Payment';
 import './Cart.css';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 export const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, cartTotal } = useContext(CartContext);
-  const { addOrder } = useContext(AppContext);
+  const { currentUser } = useContext(AppContext);
+  const { activeAccount, activeWallet, signTransactions, isReady } = useWallet();
   const navigate = useNavigate();
 
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
   const [checkoutError, setCheckoutError] = useState('');
-  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState('idle');
+  const [isConnectingWallet, setIsConnectingWallet] = useState(false);
 
-  const handleCheckout = (e) => {
+  const isProcessing = paymentStatus === 'processing' || isConnectingWallet;
+
+  const handleConnectWallet = async () => {
+    if (!activeWallet) {
+      setCheckoutError('Pera Wallet is not available.');
+      return;
+    }
+
+    setIsConnectingWallet(true);
+    setCheckoutError('');
+
+    try {
+      await activeWallet.connect();
+    } catch (error) {
+      setCheckoutError(error.message || 'Wallet connection was cancelled.');
+    } finally {
+      setIsConnectingWallet(false);
+    }
+  };
+
+  const handleCheckout = async (e) => {
     e.preventDefault();
     if (cartItems.length === 0) return;
     if (!address.trim()) {
@@ -27,33 +53,90 @@ export const Cart = () => {
       return;
     }
 
-    setIsPlacingOrder(true);
+    if (!isReady) {
+      setCheckoutError('Wallet system is still loading. Please try again.');
+      return;
+    }
+
+    let account = activeAccount;
+
+    if (!account) {
+      try {
+        setIsConnectingWallet(true);
+        if (!activeWallet) {
+          throw new Error('Pera Wallet is not available.');
+        }
+        const accounts = await activeWallet.connect();
+        account = accounts[0] ?? null;
+      } catch (error) {
+        setCheckoutError(error.message || 'Wallet connection was cancelled.');
+        setPaymentStatus('cancelled');
+        return;
+      } finally {
+        setIsConnectingWallet(false);
+      }
+    }
+
+    if (!account) {
+      setCheckoutError('Connect Pera Wallet on Algorand Testnet to complete checkout.');
+      setPaymentStatus('cancelled');
+      return;
+    }
+
+    setPaymentStatus('processing');
     setCheckoutError('');
 
-    // Simulate short network delay
-    setTimeout(() => {
+    try {
       const orderItems = cartItems.map((item) => ({
         productId: item.id,
-        name: item.name,
-        price: item.price,
-        quantity: item.cartQuantity,
-        unit: item.unit
+        quantity: item.cartQuantity
       }));
 
-      addOrder({
-        deliveryAddress: `${address} (Phone: ${phone})`,
-        items: orderItems,
-        totalAmount: cartTotal
+      const paymentFetch = createPaymentFetch(account, signTransactions);
+      const ordersEndpoint = `${API_URL}/api/orders`;
+
+      const orderResponse = await paymentFetch(ordersEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          customerId: currentUser?.id || 'guest-customer',
+          ordersName: `Order from ${address}`,
+          deliveryAddress: address,
+          contactPlace: phone,
+          items: orderItems
+        })
       });
 
-      // Clear the shopping cart
+      if (orderResponse.status === 402) {
+        setPaymentStatus('failed');
+        throw new Error('Payment was not accepted. Please ensure your wallet has Testnet USDC and try again.');
+      }
+
+      if (!orderResponse.ok) {
+        const result = await orderResponse.json().catch(() => ({}));
+        setPaymentStatus('failed');
+        throw new Error(result?.error || 'Order creation failed. Please try again.');
+      }
+
+      setPaymentStatus('success');
       clearCart();
-      setIsPlacingOrder(false);
-      
-      // Redirect to orders history
       navigate('/orders?success=true');
-    }, 1200);
+    } catch (error) {
+      const message = error.message || 'Order could not be placed. Please try again.';
+      const isCancelled = /cancel|reject|denied|closed/i.test(message);
+      setPaymentStatus(isCancelled ? 'cancelled' : 'failed');
+      setCheckoutError(message);
+    }
   };
+
+  const paymentStatusMessage = {
+    processing: 'Processing Algorand Testnet payment...',
+    success: 'Payment successful.',
+    failed: 'Payment failed.',
+    cancelled: 'Payment cancelled.'
+  }[paymentStatus];
 
   if (cartItems.length === 0) {
     return (
@@ -78,7 +161,6 @@ export const Cart = () => {
       </header>
 
       <div className="cart-layout-grid">
-        {/* Left Column - Cart Items */}
         <div className="cart-items-column">
           <div className="cart-items-card">
             <div className="items-card-header">
@@ -102,7 +184,6 @@ export const Cart = () => {
                   </div>
 
                   <div className="cart-item-actions-row">
-                    {/* Qty Picker */}
                     <div className="qty-picker-cart">
                       <button 
                         onClick={() => updateQuantity(item.id, item.cartQuantity - 1)}
@@ -137,7 +218,6 @@ export const Cart = () => {
           </div>
         </div>
 
-        {/* Right Column - Checkout Summary & Address Form */}
         <div className="checkout-summary-column">
           <div className="checkout-card">
             <h3>Order Summary</h3>
@@ -157,7 +237,6 @@ export const Cart = () => {
               </div>
             </div>
 
-            {/* Address form */}
             <form onSubmit={handleCheckout} className="checkout-form">
               <h4 className="form-section-title">
                 <MapPin size={16} /> Delivery & Contact Details
@@ -182,8 +261,7 @@ export const Cart = () => {
                   id="phone-input"
                   placeholder="e.g. +1 (555) 123-4567"
                   value={phone}
-                  onChange={(e) => setPhone} // let's use standard onChange
-                  onInput={(e) => setPhone(e.target.value)}
+                  onChange={(e) => setPhone(e.target.value)}
                   required
                 />
               </div>
@@ -191,19 +269,44 @@ export const Cart = () => {
               <div className="payment-stub-alert">
                 <CreditCard size={16} className="stub-alert-icon" />
                 <div>
-                  <h5>x402 Protocol Active</h5>
-                  <p>In simulation mode. Order confirmation automatically clears mock payment authorization.</p>
+                  <h5>x402 Algorand Testnet Payment</h5>
+                  {activeAccount ? (
+                    <p>
+                      Wallet connected: {activeAccount.address.slice(0, 8)}...
+                      {activeAccount.address.slice(-6)}
+                    </p>
+                  ) : (
+                    <p>Connect Pera Wallet on Algorand Testnet to pay with USDC via x402.</p>
+                  )}
+                  {paymentStatus !== 'idle' && (
+                    <p>{paymentStatusMessage}</p>
+                  )}
                 </div>
               </div>
+
+              {!activeAccount && (
+                <button
+                  type="button"
+                  className="checkout-submit-btn"
+                  onClick={handleConnectWallet}
+                  disabled={isConnectingWallet}
+                >
+                  {isConnectingWallet ? 'Connecting Wallet...' : 'Connect Pera Wallet'}
+                </button>
+              )}
 
               {checkoutError && <p className="checkout-error-msg">{checkoutError}</p>}
 
               <button 
                 type="submit" 
-                className={`checkout-submit-btn ${isPlacingOrder ? 'loading' : ''}`}
-                disabled={isPlacingOrder}
+                className={`checkout-submit-btn ${isProcessing ? 'loading' : ''}`}
+                disabled={isProcessing}
               >
-                <span>{isPlacingOrder ? 'Processing Order...' : 'Confirm Order & Place Purchase'}</span>
+                <span>
+                  {paymentStatus === 'processing'
+                    ? 'Processing Payment...'
+                    : 'Confirm Order & Pay with x402'}
+                </span>
                 <ArrowRight size={18} />
               </button>
             </form>

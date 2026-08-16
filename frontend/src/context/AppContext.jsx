@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 export const AppContext = createContext();
 
@@ -164,10 +165,44 @@ const initialReviews = [
   }
 ];
 
+const normalizeSupabaseProduct = (product) => ({
+  id: product.id,
+  farmerId: product.farmer_id || product.farmerId || 'farm-1',
+  farmerName: product.farmer_name || product.farmerName || 'Local Farmer',
+  name: product.name,
+  description: product.description || '',
+  price: Number(product.price ?? 0),
+  unit: product.unit || 'lb',
+  category: product.category || 'Vegetables',
+  quantity: Number(product.quantity ?? 0),
+  image: product.image_url || product.image || '',
+  rating: Number(product.rating ?? 5.0),
+  reviewsCount: Number(product.reviews_count ?? 0)
+});
+
 export const AppProvider = ({ children }) => {
   const [products, setProducts] = useState(() => {
     const saved = localStorage.getItem('farmfresh_products');
     return saved ? JSON.parse(saved) : initialProducts;
+  });
+
+  const normalizeOrder = (order, fallbackCustomerName = 'Customer') => ({
+    id: order.id,
+    date: order.created_at || order.date || new Date().toISOString(),
+    customerId: order.customer_id || order.customerId || currentUser?.id,
+    customerName: order.customer_name || order.customerName || fallbackCustomerName,
+    deliveryAddress: order.delivery_address || order.deliveryAddress || '',
+    status: order.status || 'Pending',
+    paymentStatus: order.payment_status || order.paymentStatus || 'Paid',
+    paymentMethod: order.payment_method || order.paymentMethod || 'x402 Protocol',
+    totalAmount: Number(order.total_amount ?? order.totalAmount ?? 0),
+    items: (order.items || []).map((item) => ({
+      productId: item.product_id || item.productId,
+      name: item.name || 'Product',
+      price: Number(item.price ?? 0),
+      quantity: Number(item.quantity ?? 1),
+      unit: item.unit || ''
+    }))
   });
 
   const [orders, setOrders] = useState(() => {
@@ -179,6 +214,55 @@ export const AppProvider = ({ children }) => {
     const saved = localStorage.getItem('farmfresh_reviews');
     return saved ? JSON.parse(saved) : initialReviews;
   });
+
+  useEffect(() => {
+    if (!supabase) return;
+
+    let isMounted = true;
+
+    const hydrateSupabaseContext = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (session?.user) {
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+          if (!profileError && profile && isMounted) {
+            setCurrentUser({
+              id: profile.id,
+              name: profile.full_name || session.user.email || 'FarmFresh User',
+              email: session.user.email || '',
+              role: profile.role || 'customer'
+            });
+          }
+        }
+
+        const { data: supabaseProducts, error: productsError } = await supabase
+          .from('products')
+          .select('id, farmer_id, name, description, price, unit, category, quantity, image_url');
+
+        if (productsError) {
+          console.error('Failed to load Supabase products:', productsError.message);
+          return;
+        }
+
+        if (supabaseProducts && supabaseProducts.length > 0 && isMounted) {
+          const mappedProducts = supabaseProducts.map(normalizeSupabaseProduct);
+          setProducts(mappedProducts);
+          localStorage.setItem('farmfresh_products', JSON.stringify(mappedProducts));
+        }
+      } catch (error) {
+        console.error('Supabase hydration failed:', error);
+      }
+    };
+
+    hydrateSupabaseContext();
+    return () => { isMounted = false; };
+  }, []);
 
   // Current user role switcher (for previewing the app features)
   const [currentUser, setCurrentUser] = useState({
@@ -227,38 +311,94 @@ export const AppProvider = ({ children }) => {
   };
 
   // Order actions
-  const addOrder = (orderData) => {
-    const newOrder = {
-      id: `ord-${Math.floor(100 + Math.random() * 900)}`,
-      customerId: currentUser.id,
-      customerName: currentUser.name,
-      date: new Date().toISOString(),
-      status: 'Pending',
-      paymentStatus: 'Paid', // Pre-confirming since we skip x402 payment flow implementation for this phase
-      paymentMethod: 'x402 Protocol',
-      ...orderData
-    };
-    setOrders((prev) => [newOrder, ...prev]);
-    
-    // Deduct quantities from products
-    orderData.items.forEach(item => {
-      setProducts(prevProducts => 
-        prevProducts.map(p => {
-          if (p.id === item.productId) {
-            return { ...p, quantity: Math.max(0, p.quantity - item.quantity) };
-          }
-          return p;
-        })
-      );
-    });
+  const addOrder = async (orderData, { paymentFetch } = {}) => {
+    const isDemoId = ['user-1', 'cust-1', 'farm-1', 'admin-1'].includes(currentUser?.id);
 
-    return newOrder;
+    if (!currentUser?.id || isDemoId) {
+      throw new Error('Please log in to place an order.');
+    }
+
+    const payload = {
+      customerId: currentUser?.id,
+      ordersName: orderData.ordersName || `Order by ${currentUser?.name || 'Customer'}`,
+      deliveryAddress: orderData.deliveryAddress || '',
+      contactPlace: orderData.contactPlace || '',
+      paymentMethod: orderData.paymentMethod || 'x402 Protocol (Algorand)',
+      items: (orderData.items || []).map((item) => ({
+        productId: item.productId,
+        quantity: Number(item.quantity ?? 1)
+      }))
+    };
+
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const doFetch = paymentFetch || fetch;
+
+    try {
+      const response = await doFetch(`${apiUrl}/api/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result?.error || 'Unable to place order');
+      }
+
+      const createdOrder = normalizeOrder(result.order, currentUser?.name || 'Customer');
+
+      setOrders((prev) => [createdOrder, ...prev]);
+      localStorage.setItem('farmfresh_orders', JSON.stringify([createdOrder, ...orders]));
+
+      // Deduct quantities from products
+      (orderData.items || []).forEach((item) => {
+        setProducts((prevProducts) =>
+          prevProducts.map((p) => {
+            if (p.id === item.productId) {
+              return { ...p, quantity: Math.max(0, p.quantity - Number(item.quantity ?? 1)) };
+            }
+            return p;
+          })
+        );
+      });
+
+      return createdOrder;
+    } catch (error) {
+      console.error('Add order failed:', error);
+      throw error;
+    }
   };
 
-  const updateOrderStatus = (id, status) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === id ? { ...o, status } : o))
-    );
+  const updateOrderStatus = async (id, status) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/orders/${id}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result?.error || 'Unable to update order status');
+      }
+
+      const updatedOrder = normalizeOrder(result.order, currentUser?.name || 'Customer');
+      setOrders((prev) =>
+        prev.map((o) => (o.id === id ? { ...o, ...updatedOrder } : o))
+      );
+      localStorage.setItem('farmfresh_orders', JSON.stringify(orders.map((o) => (o.id === id ? { ...o, ...updatedOrder } : o))));
+
+      return updatedOrder;
+    } catch (error) {
+      console.error('Update order status failed:', error);
+      throw error;
+    }
   };
 
   // Review actions

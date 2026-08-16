@@ -1,23 +1,48 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { ShoppingBag, Calendar, MapPin, CheckCircle2, Clock, Truck, ClipboardList } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import './FarmerOrders.css';
 
 export const FarmerOrders = () => {
-  const { orders, products, updateOrderStatus } = useContext(AppContext);
+  const { currentUser, updateOrderStatus } = useContext(AppContext);
+  const [farmerOrders, setFarmerOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
 
-  // Filter products belonging to this farmer ('farm-1')
-  const farmerProductIds = products
-    .filter((p) => p.farmerId === 'farm-1')
-    .map((p) => p.id);
+  useEffect(() => {
+    const loadFarmerOrders = async () => {
+      if (!currentUser?.id) return;
 
-  // Filter orders that have items from this farmer
-  const farmerOrders = orders.filter((order) =>
-    order.items.some((item) => farmerProductIds.includes(item.productId))
-  );
+      setLoadingOrders(true);
 
-  const handleStatusChange = (orderId, newStatus) => {
-    updateOrderStatus(orderId, newStatus);
+      try {
+        const response = await fetch(`http://localhost:5000/api/orders/farmer/${currentUser.id}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data?.error || 'Unable to load farmer orders');
+        }
+
+        setFarmerOrders(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Load farmer orders failed:', error);
+        setFarmerOrders([]);
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+
+    loadFarmerOrders();
+  }, [currentUser?.id]);
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      const updatedOrder = await updateOrderStatus(orderId, newStatus);
+      setFarmerOrders((prev) =>
+        prev.map((order) => (order.id === orderId ? { ...order, status: updatedOrder.status } : order))
+      );
+    } catch (error) {
+      console.error('Status update failed:', error);
+    }
   };
 
   const getStatusIcon = (status) => {
@@ -40,17 +65,16 @@ export const FarmerOrders = () => {
         <p>Monitor customer orders for your crops and update delivery tracking statuses.</p>
       </header>
 
-      {farmerOrders.length > 0 ? (
+      {loadingOrders ? (
+        <div className="empty-desk-box">
+          <p>Loading farmer orders...</p>
+        </div>
+      ) : farmerOrders.length > 0 ? (
         <div className="orders-desk-list" id="farmer-orders-list">
           {farmerOrders.map((order) => {
-            // Find items from this farmer
-            const farmerItems = order.items.filter((item) =>
-              farmerProductIds.includes(item.productId)
-            );
-            
-            // Total amount for this farmer's products in the order
+            const farmerItems = Array.isArray(order.items) ? order.items : [];
             const farmerOrderSubtotal = farmerItems.reduce(
-              (sum, item) => sum + item.price * item.quantity,
+              (sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0),
               0
             );
 
@@ -92,7 +116,7 @@ export const FarmerOrders = () => {
                     <div className="customer-meta-row-desk">
                       <MapPin size={16} className="desk-pin-icon" />
                       <div>
-                        <strong>{order.customerName}</strong>
+                        <strong>{order.customerName || 'Customer'}</strong>
                         <p>{order.deliveryAddress}</p>
                       </div>
                     </div>
