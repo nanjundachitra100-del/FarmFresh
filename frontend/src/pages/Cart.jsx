@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Trash2, ShoppingBag, ArrowRight, MapPin, CreditCard } from 'lucide-react';
 import { useWallet } from '@txnlab/use-wallet-react';
+import { WalletId } from '@txnlab/use-wallet';
 import { CartContext } from '../context/CartContext';
 import { AppContext } from '../context/AppContext';
 import { createPaymentFetch } from '../lib/x402Payment';
@@ -12,7 +13,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 export const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, cartTotal } = useContext(CartContext);
   const { currentUser } = useContext(AppContext);
-  const { activeAccount, activeWallet, signTransactions, isReady } = useWallet();
+  const { activeAccount, wallets, signTransactions, isReady } = useWallet();
+  const peraWallet = wallets.find((wallet) => wallet.id === WalletId.PERA);
   const navigate = useNavigate();
 
   const [address, setAddress] = useState('');
@@ -24,7 +26,12 @@ export const Cart = () => {
   const isProcessing = paymentStatus === 'processing' || isConnectingWallet;
 
   const handleConnectWallet = async () => {
-    if (!activeWallet) {
+    if (!isReady) {
+      setCheckoutError('Wallet system is still loading. Please try again.');
+      return;
+    }
+
+    if (!peraWallet) {
       setCheckoutError('Pera Wallet is not available.');
       return;
     }
@@ -33,7 +40,7 @@ export const Cart = () => {
     setCheckoutError('');
 
     try {
-      await activeWallet.connect();
+      await peraWallet.connect();
     } catch (error) {
       setCheckoutError(error.message || 'Wallet connection was cancelled.');
     } finally {
@@ -63,10 +70,10 @@ export const Cart = () => {
     if (!account) {
       try {
         setIsConnectingWallet(true);
-        if (!activeWallet) {
+        if (!peraWallet) {
           throw new Error('Pera Wallet is not available.');
         }
-        const accounts = await activeWallet.connect();
+        const accounts = await peraWallet.connect();
         account = accounts[0] ?? null;
       } catch (error) {
         setCheckoutError(error.message || 'Wallet connection was cancelled.');
@@ -289,7 +296,7 @@ export const Cart = () => {
                   type="button"
                   className="checkout-submit-btn"
                   onClick={handleConnectWallet}
-                  disabled={isConnectingWallet}
+                  disabled={isConnectingWallet || !isReady}
                 >
                   {isConnectingWallet ? 'Connecting Wallet...' : 'Connect Pera Wallet'}
                 </button>
