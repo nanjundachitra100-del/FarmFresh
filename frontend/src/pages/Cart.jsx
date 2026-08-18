@@ -12,7 +12,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 export const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, cartTotal } = useContext(CartContext);
   const { currentUser } = useContext(AppContext);
-  const { activeAccount, activeWallet, signTransactions, isReady } = useWallet();
+  const { wallets, activeAccount, activeWallet, signTransactions, isReady } = useWallet();
   const navigate = useNavigate();
 
   const [address, setAddress] = useState('');
@@ -24,7 +24,8 @@ export const Cart = () => {
   const isProcessing = paymentStatus === 'processing' || isConnectingWallet;
 
   const handleConnectWallet = async () => {
-    if (!activeWallet) {
+    const peraWallet = activeWallet ?? wallets.find((w) => w.id === 'pera');
+    if (!peraWallet) {
       setCheckoutError('Pera Wallet is not available.');
       return;
     }
@@ -33,7 +34,7 @@ export const Cart = () => {
     setCheckoutError('');
 
     try {
-      await activeWallet.connect();
+      await peraWallet.connect();
     } catch (error) {
       setCheckoutError(error.message || 'Wallet connection was cancelled.');
     } finally {
@@ -63,10 +64,11 @@ export const Cart = () => {
     if (!account) {
       try {
         setIsConnectingWallet(true);
-        if (!activeWallet) {
+        const peraWallet = activeWallet ?? wallets.find((w) => w.id === 'pera');
+        if (!peraWallet) {
           throw new Error('Pera Wallet is not available.');
         }
-        const accounts = await activeWallet.connect();
+        const accounts = await peraWallet.connect();
         account = accounts[0] ?? null;
       } catch (error) {
         setCheckoutError(error.message || 'Wallet connection was cancelled.');
