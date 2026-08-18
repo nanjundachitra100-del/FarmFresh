@@ -215,6 +215,40 @@ export const AppProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : initialReviews;
   });
 
+  // currentUser is null until a real Supabase session is confirmed
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // Fetch profile row and map it to currentUser shape
+  const loadUserProfile = async (supabaseUser) => {
+    if (!supabaseUser) {
+      setCurrentUser(null);
+      return;
+    }
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('id, full_name, role')
+      .eq('id', supabaseUser.id)
+      .maybeSingle();
+
+    if (!error && profile) {
+      setCurrentUser({
+        id: profile.id,
+        name: profile.full_name || supabaseUser.email || 'FarmFresh User',
+        email: supabaseUser.email || '',
+        role: profile.role || 'customer'
+      });
+    } else {
+      // Profile may not exist yet (trigger delay) — fall back to metadata
+      const meta = supabaseUser.user_metadata || {};
+      setCurrentUser({
+        id: supabaseUser.id,
+        name: meta.full_name || supabaseUser.email || 'FarmFresh User',
+        email: supabaseUser.email || '',
+        role: meta.role || 'customer'
+      });
+    }
+  };
+
   useEffect(() => {
     if (!supabase) return;
 
@@ -222,38 +256,72 @@ export const AppProvider = ({ children }) => {
 
     const hydrateSupabaseContext = async () => {
       try {
+        // Auth: load current session on mount
         const { data: { session } } = await supabase.auth.getSession();
+        if (isMounted) await loadUserProfile(session?.user ?? null);
 
-        if (session?.user) {
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .maybeSingle();
-
-          if (!profileError && profile && isMounted) {
-            setCurrentUser({
-              id: profile.id,
-              name: profile.full_name || session.user.email || 'FarmFresh User',
-              email: session.user.email || '',
-              role: profile.role || 'customer'
-            });
-          }
-        }
-
+        // Products (public — no auth required)
         const { data: supabaseProducts, error: productsError } = await supabase
           .from('products')
           .select('id, farmer_id, name, description, price, unit, category, quantity, image_url');
 
         if (productsError) {
           console.error('Failed to load Supabase products:', productsError.message);
-          return;
-        }
-
-        if (supabaseProducts && supabaseProducts.length > 0 && isMounted) {
+        } else if (supabaseProducts && supabaseProducts.length > 0 && isMounted) {
           const mappedProducts = supabaseProducts.map(normalizeSupabaseProduct);
           setProducts(mappedProducts);
           localStorage.setItem('farmfresh_products', JSON.stringify(mappedProducts));
+        }
+
+        // Orders (RLS: authenticated users see their own; admin sees all)
+        const { data: supabaseOrders, error: ordersError } = await supabase
+          .from('orders')
+          .select(`
+            id,
+            customer_id,
+            delivery_address,
+            total_amount,
+            status,
+            payment_status,
+            payment_method,
+            created_at,
+            profiles!orders_customer_id_fkey ( full_name ),
+            order_items (
+              product_id,
+              quantity,
+              price_at_purchase,
+              products ( name, unit )
+            )
+          `)
+          .order('created_at', { ascending: false });
+
+        if (ordersError) {
+          console.error('Failed to load Supabase orders:', ordersError.message);
+        } else if (supabaseOrders && supabaseOrders.length > 0 && isMounted) {
+          const mappedOrders = supabaseOrders.map((order) => {
+            const customerName = order.profiles?.full_name || 'Customer';
+            const items = (order.order_items || []).map((item) => ({
+              productId: item.product_id,
+              name: item.products?.name || 'Product',
+              price: Number(item.price_at_purchase ?? 0),
+              quantity: Number(item.quantity ?? 1),
+              unit: item.products?.unit || ''
+            }));
+            return normalizeOrder({
+              id: order.id,
+              customer_id: order.customer_id,
+              customer_name: customerName,
+              delivery_address: order.delivery_address,
+              created_at: order.created_at,
+              total_amount: order.total_amount,
+              status: order.status,
+              payment_status: order.payment_status,
+              payment_method: order.payment_method,
+              items
+            }, customerName);
+          });
+          setOrders(mappedOrders);
+          localStorage.setItem('farmfresh_orders', JSON.stringify(mappedOrders));
         }
       } catch (error) {
         console.error('Supabase hydration failed:', error);
@@ -261,16 +329,17 @@ export const AppProvider = ({ children }) => {
     };
 
     hydrateSupabaseContext();
-    return () => { isMounted = false; };
-  }, []);
 
-  // Current user role switcher (for previewing the app features)
-  const [currentUser, setCurrentUser] = useState({
-    id: 'user-1',
-    name: 'Sarah Jenkins',
-    email: 'sarah@example.com',
-    role: 'customer' // 'customer', 'farmer', or 'admin'
-  });
+    // Keep currentUser in sync with Supabase auth state changes (login / logout / token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (isMounted) loadUserProfile(session?.user ?? null);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   // Persist state in localStorage
   useEffect(() => {
