@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { productService } from '../services/productService';
 
 export const AppContext = createContext();
 
@@ -185,6 +186,7 @@ export const AppProvider = ({ children }) => {
     const saved = localStorage.getItem('farmfresh_products');
     return saved ? JSON.parse(saved) : initialProducts;
   });
+  const [productsHydrated, setProductsHydrated] = useState(false);
 
   const normalizeOrder = (order, fallbackCustomerName = 'Customer') => ({
     id: order.id,
@@ -250,10 +252,11 @@ export const AppProvider = ({ children }) => {
           return;
         }
 
-        if (supabaseProducts && supabaseProducts.length > 0 && isMounted) {
-          const mappedProducts = supabaseProducts.map(normalizeSupabaseProduct);
+        if (isMounted) {
+          const mappedProducts = (supabaseProducts || []).map(normalizeSupabaseProduct);
           setProducts(mappedProducts);
           localStorage.setItem('farmfresh_products', JSON.stringify(mappedProducts));
+          setProductsHydrated(true);
         }
       } catch (error) {
         console.error('Supabase hydration failed:', error);
@@ -286,18 +289,15 @@ export const AppProvider = ({ children }) => {
   }, [reviews]);
 
   // Product actions
-  const addProduct = (productData) => {
-    const newProduct = {
-      id: `prod-${Date.now()}`,
-      farmerId: 'farm-1', // Mocking current farmer ID
-      farmerName: 'Green Valley Organic Farms', // Mocking current farmer Name
-      rating: 5.0,
-      reviewsCount: 0,
+  const addProduct = async (productData) => {
+    const createdProduct = await productService.createProduct({
       ...productData,
-      price: parseFloat(productData.price),
-      quantity: parseInt(productData.quantity)
-    };
-    setProducts((prev) => [newProduct, ...prev]);
+      farmerId: currentUser?.id
+    });
+    const normalizedProduct = normalizeSupabaseProduct(createdProduct);
+
+    setProducts((prev) => [normalizedProduct, ...prev]);
+    return normalizedProduct;
   };
 
   const updateProduct = (id, updatedData) => {
@@ -456,6 +456,7 @@ export const AppProvider = ({ children }) => {
     <AppContext.Provider
       value={{
         products,
+        productsHydrated,
         orders,
         reviews,
         currentUser,

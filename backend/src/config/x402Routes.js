@@ -13,6 +13,9 @@ function createX402Routes(avmAddress, algorandNetwork) {
         payTo: avmAddress,
         price: async (context) => {
           const body = context.adapter.getBody?.() ?? {};
+          if (process.env.NODE_ENV !== 'production') {
+            console.info('[x402] pricing request product IDs:', (body.items || []).map((item) => item.productId));
+          }
           const totalAmount = await calculateOrderTotalFromItems(body.items || []);
           return `$${totalAmount.toFixed(2)}`;
         },

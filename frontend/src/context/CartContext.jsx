@@ -1,8 +1,12 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { AppContext } from './AppContext';
 
 export const CartContext = createContext();
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export const CartProvider = ({ children }) => {
+  const { products, productsHydrated } = useContext(AppContext);
   const [cartItems, setCartItems] = useState(() => {
     const saved = localStorage.getItem('farmfresh_cart');
     return saved ? JSON.parse(saved) : [];
@@ -12,7 +16,27 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('farmfresh_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
+  useEffect(() => {
+    if (!productsHydrated) return;
+
+    const validProductIds = new Set(products.map((product) => product.id));
+    setCartItems((prevItems) => {
+      const currentItems = prevItems.filter(
+        (item) => UUID_PATTERN.test(item.id) && validProductIds.has(item.id)
+      );
+      return currentItems.length === prevItems.length ? prevItems : currentItems;
+    });
+  }, [products, productsHydrated]);
+
   const addToCart = (product, quantity = 1) => {
+    if (
+      !productsHydrated ||
+      !UUID_PATTERN.test(product.id) ||
+      !products.some((catalogProduct) => catalogProduct.id === product.id)
+    ) {
+      return;
+    }
+
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id);
       

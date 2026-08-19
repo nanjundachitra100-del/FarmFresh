@@ -9,10 +9,11 @@ import { createPaymentFetch } from '../lib/x402Payment';
 import './Cart.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, cartTotal } = useContext(CartContext);
-  const { currentUser } = useContext(AppContext);
+  const { currentUser, products, productsHydrated } = useContext(AppContext);
   const { activeAccount, wallets, signTransactions, isReady } = useWallet();
   const peraWallet = wallets.find((wallet) => wallet.id === WalletId.PERA);
   const navigate = useNavigate();
@@ -60,6 +61,21 @@ export const Cart = () => {
       return;
     }
 
+    if (!productsHydrated) {
+      setCheckoutError('The product catalog is still loading. Please try checkout again in a moment.');
+      return;
+    }
+
+    const validProductIds = new Set(products.map((product) => product.id));
+    const hasInvalidCartItem = cartItems.some(
+      (item) => !UUID_PATTERN.test(item.id) || !validProductIds.has(item.id)
+    );
+
+    if (hasInvalidCartItem) {
+      setCheckoutError('Your cart contains stale products. Please re-add the current catalog items before checkout.');
+      return;
+    }
+
     if (!isReady) {
       setCheckoutError('Wallet system is still loading. Please try again.');
       return;
@@ -99,6 +115,18 @@ export const Cart = () => {
         quantity: item.cartQuantity
       }));
 
+      const orderPayload = {
+        customerId: currentUser?.id || 'guest-customer',
+        ordersName: `Order from ${address}`,
+        deliveryAddress: address,
+        contactPlace: phone,
+        items: orderItems
+      };
+
+      if (import.meta.env.DEV) {
+        console.info('[checkout] x402 order item IDs', orderItems);
+      }
+
       const paymentFetch = createPaymentFetch(account, signTransactions);
       const ordersEndpoint = `${API_URL}/api/orders`;
 
@@ -107,13 +135,7 @@ export const Cart = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          customerId: currentUser?.id || 'guest-customer',
-          ordersName: `Order from ${address}`,
-          deliveryAddress: address,
-          contactPlace: phone,
-          items: orderItems
-        })
+        body: JSON.stringify(orderPayload)
       });
 
       if (orderResponse.status === 402) {

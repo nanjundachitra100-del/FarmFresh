@@ -12,7 +12,6 @@ const {
 const { ExactAvmScheme } = require('@x402/avm/exact/server');
 
 const {
-  ALGORAND_TESTNET_CAIP2,
   isValidAlgorandAddress
 } = require('@x402/avm');
 
@@ -25,6 +24,10 @@ const { createX402Routes } = require('./src/config/x402Routes');
 const ordersRouter = require('./src/routes/orders');
 
 const app = express();
+
+// Matches the full Testnet CAIP-2 identifier advertised by the configured x402 facilitator.
+const ALGORAND_TESTNET_CAIP2 =
+  'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=';
 
 const PORT = process.env.PORT || 5000;
 
