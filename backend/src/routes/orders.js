@@ -131,6 +131,107 @@ router.post('/', async (req, res) => {
 });
 
 
+// Get orders for a customer
+router.get('/customer/:customerId', async (req, res) => {
+  try {
+    const { customerId } = req.params;
+
+    if (!customerId) {
+      return res.status(400).json({
+        error: 'customerId is required'
+      });
+    }
+
+    const { data: orders, error: ordersError } = await supabaseAdmin
+      .from('orders')
+      .select('*')
+      .eq('customer_id', customerId)
+      .order('created_at', { ascending: false });
+
+    if (ordersError) {
+      return res.status(500).json({
+        error: ordersError.message
+      });
+    }
+
+    if (!orders || orders.length === 0) {
+      return res.json([]);
+    }
+
+    const orderIds = orders.map((order) => order.id);
+
+    const { data: orderItems, error: orderItemsError } = await supabaseAdmin
+      .from('order_items')
+      .select('order_id, product_id, quantity, price_at_purchase')
+      .in('order_id', orderIds);
+
+    if (orderItemsError) {
+      return res.status(500).json({
+        error: orderItemsError.message
+      });
+    }
+
+    const productIdsForLookup = [
+      ...new Set((orderItems || []).map((item) => item.product_id))
+    ];
+    let productMap = {};
+
+    if (productIdsForLookup.length > 0) {
+      const { data: productRows, error: productRowsError } = await supabaseAdmin
+        .from('products')
+        .select('id, name, unit')
+        .in('id', productIdsForLookup);
+
+      if (productRowsError) {
+        console.error('Load product details failed:', productRowsError.message);
+      } else {
+        productMap = Object.fromEntries(
+          (productRows || []).map((product) => [product.id, product])
+        );
+      }
+    }
+
+    const enrichedOrders = orders.map((order) => {
+      const items = (orderItems || [])
+        .filter((item) => item.order_id === order.id)
+        .map((item) => {
+          const product = productMap[item.product_id] || {};
+          const quantity = Number(item.quantity || 0);
+          const price = Number(item.price_at_purchase || 0);
+          return {
+            productId: item.product_id,
+            name: product.name || 'Product',
+            unit: product.unit || '',
+            price,
+            quantity
+          };
+        });
+
+      return {
+        id: order.id,
+        date: order.created_at,
+        customerId: order.customer_id,
+        deliveryAddress: order.delivery_address || '',
+        status: order.status,
+        paymentStatus: order.payment_status,
+        paymentMethod: order.payment_method,
+        totalAmount: Number(order.total_amount || 0),
+        items
+      };
+    });
+
+    return res.json(enrichedOrders);
+
+  } catch (error) {
+    console.error('Get customer orders error:', error);
+
+    return res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+
 // Get orders for a farmer
 router.get('/farmer/:farmerId', async (req, res) => {
   try {

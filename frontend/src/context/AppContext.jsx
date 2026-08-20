@@ -452,6 +452,21 @@ export const AppProvider = ({ children }) => {
     );
   };
 
+  // Append a raw Supabase order (from POST /api/orders response) into local state.
+  // Called by Cart.jsx after a successful x402 payment to keep context in sync
+  // without triggering a second payment request.
+  const appendOrder = (rawOrder) => {
+    if (!rawOrder?.id) return;
+    const normalized = normalizeOrder(rawOrder, currentUser?.name || 'Customer');
+    setOrders((prev) => {
+      // Guard against duplicates (e.g. StrictMode double-invoke)
+      if (prev.some((o) => o.id === normalized.id)) return prev;
+      const updated = [normalized, ...prev];
+      localStorage.setItem('farmfresh_orders', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -465,6 +480,7 @@ export const AppProvider = ({ children }) => {
         updateProduct,
         deleteProduct,
         addOrder,
+        appendOrder,
         updateOrderStatus,
         addReview,
         deleteReview

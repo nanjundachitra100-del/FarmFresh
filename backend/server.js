@@ -43,8 +43,15 @@ const AVM_ADDRESS =
   process.env.AVM_ADDRESS;
 
 const X402_FACILITATOR_URL =
-  process.env.X402_FACILITATOR_URL ||
-  'https://x402.org/facilitator';
+  process.env.X402_FACILITATOR_URL;
+
+if (!X402_FACILITATOR_URL) {
+  console.error(
+    'FATAL: X402_FACILITATOR_URL environment variable is required. ' +
+    'Set it to https://facilitator.goplausible.xyz for Algorand Testnet.'
+  );
+  process.exit(1);
+}
 
 // Validate x402 receiver address
 if (!AVM_ADDRESS) {
@@ -157,6 +164,8 @@ app.get('/', (req, res) => {
       deleteProduct:
         'DELETE /api/products/:id',
       orders: 'POST /api/orders',
+      customerOrders:
+        'GET /api/orders/customer/:customerId',
       farmerOrders:
         'GET /api/orders/farmer/:farmerId',
       updateOrderStatus:

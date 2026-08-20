@@ -13,7 +13,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
 
 export const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, cartTotal } = useContext(CartContext);
-  const { currentUser, products, productsHydrated } = useContext(AppContext);
+  const { currentUser, products, productsHydrated, appendOrder } = useContext(AppContext);
   const { activeAccount, wallets, signTransactions, isReady } = useWallet();
   const peraWallet = wallets.find((wallet) => wallet.id === WalletId.PERA);
   const navigate = useNavigate();
@@ -147,6 +147,14 @@ export const Cart = () => {
         const result = await orderResponse.json().catch(() => ({}));
         setPaymentStatus('failed');
         throw new Error(result?.error || 'Order creation failed. Please try again.');
+      }
+
+      // Parse the created order from the response and sync into local context
+      // so the cart badge and AppContext.orders stay consistent immediately.
+      // CustomerOrders will also do a fresh backend fetch on redirect.
+      const responseBody = await orderResponse.json().catch(() => ({}));
+      if (responseBody?.order) {
+        appendOrder(responseBody.order);
       }
 
       setPaymentStatus('success');
