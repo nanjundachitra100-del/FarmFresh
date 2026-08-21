@@ -2,19 +2,18 @@ import React, { useContext, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Trash2, ShoppingBag, ArrowRight, MapPin, CreditCard } from 'lucide-react';
 import { useWallet } from '@txnlab/use-wallet-react';
-import { WalletId } from '@txnlab/use-wallet';
 import { CartContext } from '../context/CartContext';
 import { AppContext } from '../context/AppContext';
 import { createPaymentFetch } from '../lib/x402Payment';
 import './Cart.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, cartTotal } = useContext(CartContext);
-  const { currentUser } = useContext(AppContext);
+  const { currentUser, addOrder } = useContext(AppContext);
   const { activeAccount, wallets, signTransactions, isReady } = useWallet();
-  const peraWallet = wallets.find((wallet) => wallet.id === WalletId.PERA);
+  const peraWallet = wallets.find((w) => w.id === 'pera');
   const navigate = useNavigate();
 
   const [address, setAddress] = useState('');
@@ -60,6 +59,17 @@ export const Cart = () => {
       return;
     }
 
+    // Guard: reject cart items that are legacy mock IDs (prod-1, prod-2, etc.)
+    // These cannot be priced by the backend and would cause a 500 error.
+    const staleItems = cartItems.filter((item) => !UUID_RE.test(item.id));
+    if (staleItems.length > 0) {
+      setCheckoutError(
+        'Your cart contains products from an older session that are not yet synced with the database. ' +
+        'Please clear your cart, wait a moment for the catalog to reload, then add items again.'
+      );
+      return;
+    }
+
     if (!isReady) {
       setCheckoutError('Wallet system is still loading. Please try again.');
       return;
@@ -99,32 +109,27 @@ export const Cart = () => {
         quantity: item.cartQuantity
       }));
 
+      // createPaymentFetch wraps the native fetch so @x402/fetch automatically:
+      // 1. Makes the initial POST
+      // 2. Receives the 402 payment requirement
+      // 3. Builds the Algorand payment transaction
+      // 4. Prompts Pera Wallet to sign
+      // 5. Retries the POST with the X-PAYMENT header
+      // 6. Returns the final response (2xx on success)
       const paymentFetch = createPaymentFetch(account, signTransactions);
-      const ordersEndpoint = `${API_URL}/api/orders`;
 
-      const orderResponse = await paymentFetch(ordersEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          customerId: currentUser?.id || 'guest-customer',
+      const orderResponse = await addOrder(
+        {
           ordersName: `Order from ${address}`,
           deliveryAddress: address,
           contactPlace: phone,
           items: orderItems
-        })
-      });
+        },
+        { paymentFetch }
+      );
 
-      if (orderResponse.status === 402) {
-        setPaymentStatus('failed');
-        throw new Error('Payment was not accepted. Please ensure your wallet has Testnet USDC and try again.');
-      }
-
-      if (!orderResponse.ok) {
-        const result = await orderResponse.json().catch(() => ({}));
-        setPaymentStatus('failed');
-        throw new Error(result?.error || 'Order creation failed. Please try again.');
+      if (!orderResponse) {
+        throw new Error('Order creation failed. Please try again.');
       }
 
       setPaymentStatus('success');

@@ -14,6 +14,8 @@ router.post('/', async (req, res) => {
       items
     } = req.body;
 
+    console.log(`[Orders] POST /api/orders — customerId: ${customerId}, items: ${JSON.stringify(items)}`);
+
     if (!customerId || !items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({
         error: 'customerId and at least one item are required'

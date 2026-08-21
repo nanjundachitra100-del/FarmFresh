@@ -32,9 +32,14 @@ const CLIENT_ORIGIN =
   process.env.CLIENT_ORIGIN ||
   'http://localhost:5173';
 
-const ALGORAND_NETWORK =
-  process.env.ALGORAND_NETWORK ||
-  ALGORAND_TESTNET_CAIP2;
+const ALGORAND_NETWORK = (() => {
+  const raw = process.env.ALGORAND_NETWORK;
+  if (!raw) return ALGORAND_TESTNET_CAIP2;
+  // Accept canonical CAIP-2 as-is; also handle legacy short names
+  if (raw === 'algorand-testnet' || raw === 'testnet') return ALGORAND_TESTNET_CAIP2;
+  if (raw === 'algorand-mainnet' || raw === 'mainnet') return 'algorand:wGHE2Pwdvd7S12BL5FaOP20EGYesN73k';
+  return raw; // assume caller provided valid CAIP-2
+})();
 
 const AVM_ADDRESS =
   process.env.AVM_ADDRESS;
@@ -73,10 +78,12 @@ app.use(
       CLIENT_ORIGIN,
       'http://localhost:5173',
       'http://127.0.0.1:5173',
-        'http://localhost:5175',
-        'http://127.0.0.1:5175',
-        'http://localhost:5177',
-        'http://127.0.0.1:5177'
+      'http://localhost:5174',
+      'http://127.0.0.1:5174',
+      'http://localhost:5175',
+      'http://127.0.0.1:5175',
+      'http://localhost:5177',
+      'http://127.0.0.1:5177'
     ],
     credentials: true,
     exposedHeaders: [
