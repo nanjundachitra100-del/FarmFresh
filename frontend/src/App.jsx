@@ -17,6 +17,7 @@ import { FarmerDashboard } from './pages/FarmerDashboard';
 import { FarmerProducts } from './pages/FarmerProducts';
 import { FarmerOrders } from './pages/FarmerOrders';
 import { AdminDashboard } from './pages/AdminDashboard';
+import { AuthPage } from './pages/AuthPage';
 
 // Style sheets
 import './styles/variables.css';
@@ -33,6 +34,9 @@ function App() {
             
             <main className="main-content-layout">
               <Routes>
+                {/* Auth */}
+                <Route path="/login" element={<AuthPage />} />
+
                 {/* Customer / Common Routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/products" element={<BrowseProducts />} />

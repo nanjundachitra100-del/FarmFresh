@@ -1,5 +1,4 @@
-import { createContext, useState, useEffect, useCallback } from 'react';
-import { supabase } from '../lib/supabase';
+import React, { createContext, useState, useEffect } from 'react';
 
 export const AppContext = createContext();
 
@@ -174,88 +173,31 @@ const initialReviews = [
   }
 ];
 
-// ---------------------------------------------------------------------------
-// Helper: clear cart items that have stale prod-* IDs so they can't reach
-// checkout. Called once on startup and after product load.
-// ---------------------------------------------------------------------------
-function evictStaleProdIdsFromCart() {
-  try {
-    const raw = localStorage.getItem('farmfresh_cart');
-    if (!raw) return;
-    const items = JSON.parse(raw);
-    const clean = items.filter((item) => isUUID(item.id));
-    if (clean.length !== items.length) {
-      localStorage.setItem('farmfresh_cart', JSON.stringify(clean));
-    }
-  } catch {
-    // corrupted — ignore
-  }
-}
-
 export const AppProvider = ({ children }) => {
-  // -------------------------------------------------------------------------
-  // Auth state
-  // -------------------------------------------------------------------------
+  const [products, setProducts] = useState(() => {
+    const saved = localStorage.getItem('farmfresh_products');
+    return saved ? JSON.parse(saved) : initialProducts;
+  });
+
+  const [orders, setOrders] = useState(() => {
+    const saved = localStorage.getItem('farmfresh_orders');
+    return saved ? JSON.parse(saved) : initialOrders;
+  });
+
+  const [reviews, setReviews] = useState(() => {
+    const saved = localStorage.getItem('farmfresh_reviews');
+    return saved ? JSON.parse(saved) : initialReviews;
+  });
+
+  // Current user role switcher (for previewing the app features)
   const [currentUser, setCurrentUser] = useState({
     id: 'user-1',
     name: 'Sarah Jenkins',
     email: 'sarah@example.com',
-    role: 'customer'
+    role: 'customer' // 'customer', 'farmer', or 'admin'
   });
 
-  // -------------------------------------------------------------------------
-  // Product state — start with mock fallback, replace ASAP from backend API
-  // -------------------------------------------------------------------------
-  const [products, setProducts] = useState(initialProducts);
-  const [loadingProducts, setLoadingProducts] = useState(false);
-  const [productError, setProductError] = useState(null);
-
-  // Load products from backend API. Falls back to mock if unreachable.
-  const loadProducts = useCallback(async () => {
-    setLoadingProducts(true);
-    setProductError(null);
-    try {
-      const res = await fetch(`${API_URL}/api/products`);
-      if (!res.ok) throw new Error(`Backend returned ${res.status}`);
-      const data = await res.json();
-      const apiProducts = (data.products || []).map((p) => ({
-        id: p.id,
-        farmerId: p.farmerId || p.farmer_id || '',
-        farmerName: p.farmerName || p.farmer_name || 'Local Farmer',
-        name: p.name,
-        description: p.description || '',
-        price: Number(p.price ?? 0),
-        unit: p.unit || 'lb',
-        category: p.category || 'Vegetables',
-        quantity: Number(p.quantity ?? 0),
-        image: p.image || p.image_url || '',
-        rating: Number(p.rating ?? 5.0),
-        reviewsCount: Number(p.reviewsCount ?? p.reviews_count ?? 0)
-      }));
-      if (apiProducts.length > 0) {
-        setProducts(apiProducts);
-        // Evict any stale cart items now that we have real UUIDs
-        evictStaleProdIdsFromCart();
-      }
-    } catch (err) {
-      console.warn('[AppContext] Could not load products from backend:', err.message);
-      setProductError('Could not connect to backend. Showing preview catalog.');
-      // Keep mock products as fallback — they are display-only
-    } finally {
-      setLoadingProducts(false);
-    }
-  }, []);
-
-  // Load products on mount and on Supabase session ready
-  useEffect(() => {
-    // Evict stale prod-* IDs from cart immediately on startup
-    evictStaleProdIdsFromCart();
-    loadProducts();
-  }, [loadProducts]);
-
-  // -------------------------------------------------------------------------
-  // Supabase auth hydration (user profile)
-  // -------------------------------------------------------------------------
+  // Persist state in localStorage
   useEffect(() => {
     if (!supabase) return;
     let isMounted = true;
@@ -298,30 +240,11 @@ export const AppProvider = ({ children }) => {
   // -------------------------------------------------------------------------
   // Orders
   // -------------------------------------------------------------------------
-  const [orders, setOrders] = useState(() => {
-    try {
-      const saved = localStorage.getItem('farmfresh_orders');
-      return saved ? JSON.parse(saved) : initialOrders;
-    } catch { return initialOrders; }
-  });
-
-  useEffect(() => {
-    localStorage.setItem('farmfresh_orders', JSON.stringify(orders));
-  }, [orders]);
 
   // -------------------------------------------------------------------------
   // Reviews
   // -------------------------------------------------------------------------
-  const [reviews, setReviews] = useState(() => {
-    try {
-      const saved = localStorage.getItem('farmfresh_reviews');
-      return saved ? JSON.parse(saved) : initialReviews;
-    } catch { return initialReviews; }
-  });
 
-  useEffect(() => {
-    localStorage.setItem('farmfresh_reviews', JSON.stringify(reviews));
-  }, [reviews]);
 
   // -------------------------------------------------------------------------
   // normalizeOrder (closure over currentUser is fine — re-created each render)
@@ -413,76 +336,38 @@ export const AppProvider = ({ children }) => {
 
   // -------------------------------------------------------------------------
   // Order actions
-  // -------------------------------------------------------------------------
-  const addOrder = async (orderData, { paymentFetch } = {}) => {
-    const isDemoId = ['user-1', 'cust-1', 'farm-1', 'admin-1'].includes(currentUser?.id);
-    if (!currentUser?.id || isDemoId) {
-      throw new Error('Please log in to place an order.');
-    }
-
-    // Validate all product IDs are real UUIDs before sending
-    const items = orderData.items || [];
-    const invalidItems = items.filter((item) => !isUUID(item.productId));
-    if (invalidItems.length > 0) {
-      throw new Error(
-        `Cart contains products not loaded from the database (${invalidItems.map((i) => i.productId).join(', ')}). Please clear your cart and add products again from the shop.`
-      );
-    }
-
-    const payload = {
-      customerId: currentUser?.id,
-      ordersName: orderData.ordersName || `Order by ${currentUser?.name || 'Customer'}`,
-      deliveryAddress: orderData.deliveryAddress || '',
-      contactPlace: orderData.contactPlace || '',
-      paymentMethod: orderData.paymentMethod || 'x402 Protocol (Algorand)',
-      items: items.map((item) => ({
-        productId: item.productId,
-        quantity: Number(item.quantity ?? 1)
-      }))
+  const addOrder = (orderData) => {
+    const newOrder = {
+      id: `ord-${Math.floor(100 + Math.random() * 900)}`,
+      customerId: currentUser.id,
+      customerName: currentUser.name,
+      date: new Date().toISOString(),
+      status: 'Pending',
+      paymentStatus: 'Paid', // Pre-confirming since we skip x402 payment flow implementation for this phase
+      paymentMethod: 'x402 Protocol',
+      ...orderData
     };
-
-    const doFetch = paymentFetch || fetch;
-
-    const response = await doFetch(`${API_URL}/api/orders`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result?.error || 'Unable to place order');
-    }
-
-    const createdOrder = normalizeOrder(result.order, currentUser?.name || 'Customer');
-    setOrders((prev) => [createdOrder, ...prev]);
-
-    // Deduct quantities from local product state
-    items.forEach((item) => {
-      setProducts((prev) =>
-        prev.map((p) =>
-          p.id === item.productId
-            ? { ...p, quantity: Math.max(0, p.quantity - Number(item.quantity ?? 1)) }
-            : p
-        )
+    setOrders((prev) => [newOrder, ...prev]);
+    
+    // Deduct quantities from products
+    orderData.items.forEach(item => {
+      setProducts(prevProducts => 
+        prevProducts.map(p => {
+          if (p.id === item.productId) {
+            return { ...p, quantity: Math.max(0, p.quantity - item.quantity) };
+          }
+          return p;
+        })
       );
     });
 
-    return createdOrder;
+    return newOrder;
   };
 
-  const updateOrderStatus = async (id, status) => {
-    const response = await fetch(`${API_URL}/api/orders/${id}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status })
-    });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result?.error || 'Unable to update order status');
-    const updatedOrder = normalizeOrder(result.order, currentUser?.name || 'Customer');
-    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, ...updatedOrder } : o)));
-    return updatedOrder;
+  const updateOrderStatus = (id, status) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === id ? { ...o, status } : o))
+    );
   };
 
   // -------------------------------------------------------------------------

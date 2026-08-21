@@ -79,7 +79,7 @@ export const AdminDashboard = () => {
           <div className="stat-details">
             <span className="stat-label">Gross Merchandise Value</span>
             <h3>${platformGMV.toFixed(2)}</h3>
-            <span className="stat-trend green-admin-color">x402 simulated payments</span>
+            <span className="stat-trend green-admin-color">x402 protocol payments</span>
           </div>
         </div>
 
@@ -160,7 +160,7 @@ export const AdminDashboard = () => {
         {/* Payments monitor logs */}
         <section className="admin-card-section">
           <div className="admin-card-header">
-            <h3>Simulated x402 Payment Monitor</h3>
+            <h3>x402 Payment Monitor</h3>
           </div>
 
           <div className="payments-log-list">
@@ -180,10 +180,12 @@ export const AdminDashboard = () => {
                     <tr key={order.id} className="payment-row">
                       <td><strong>#{order.id}</strong></td>
                       <td>{order.customerName}</td>
-                      <td className="protocol-code">x402 SIM</td>
+                      <td className="protocol-code">{order.paymentMethod || 'x402'}</td>
                       <td><strong>${order.totalAmount.toFixed(2)}</strong></td>
                       <td>
-                        <span className="payment-verified-badge">Verified</span>
+                        <span className="payment-verified-badge">
+                          {order.paymentStatus === 'Paid' || order.paymentStatus === 'paid' ? 'Verified' : order.paymentStatus}
+                        </span>
                       </td>
                     </tr>
                   ))}
