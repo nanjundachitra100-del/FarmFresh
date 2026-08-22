@@ -77,19 +77,20 @@ router.post('/', async (req, res) => {
     }
 
     const { data: order, error: orderError } = await supabaseAdmin
-      .from('orders')
-      .insert({
-        orders_name: ordersName || `Order by ${customerId}`,
-        customer_id: customerId,
-        delivery_address: deliveryAddress || '',
-        contact_place: contactPlace || '',
-        total_amount: totalAmount,
-        status: 'Pending',
-        payment_status: 'Paid',
-        payment_method: 'x402 Protocol (Algorand)'
-      })
-      .select()
-      .single();
+  .from('orders')
+  .insert({
+      order_number: `FF-${Date.now()}`,
+    orders_name: ordersName || `Order by ${customerId}`,
+    customer_id: customerId,
+    delivery_address: deliveryAddress || '',
+    contact_place: contactPlace || '',
+    total_amount: totalAmount,
+    status: 'pending',
+   payment_status: 'paid',
+    payment_method: 'x402 Protocol (Algorand)'
+  })
+  .select()
+  .single();
 
     if (orderError) {
       return res.status(500).json({
@@ -97,15 +98,22 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const itemsToInsert = orderItems.map((item) => ({
-      order_id: order.id,
-      product_id: item.product_id,
-      quantity: item.quantity
-    }));
+    const itemsToInsert = orderItems.map((item) => {
+  const product = products.find(
+    (p) => p.id === item.product_id
+  );
 
-    const { error: itemsError } = await supabaseAdmin
-      .from('order_items')
-      .insert(itemsToInsert);
+  return {
+    order_id: order.id,
+    product_id: item.product_id,
+    quantity: item.quantity,
+    price_at_purchase: Number(product.price)
+  };
+});
+
+const { error: itemsError } = await supabaseAdmin
+  .from('order_items')
+  .insert(itemsToInsert);
 
     if (itemsError) {
       await supabaseAdmin
