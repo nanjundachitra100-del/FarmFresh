@@ -130,7 +130,7 @@ export const FarmerOrders = () => {
                         <div key={idx} className="desk-item-row">
                           <span className="desk-item-name">{item.name}</span>
                           <span className="desk-item-qty">x{item.quantity} {item.unit}</span>
-                          <span className="desk-item-sum">${(item.price * item.quantity).toFixed(2)}</span>
+                          <span className="desk-item-sum">${(Number(item.price) * Number(item.quantity)).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
@@ -147,7 +147,7 @@ export const FarmerOrders = () => {
 
                   <div className="desk-earnings-info">
                     <span>Your Earnings:</span>
-                    <span className="earnings-val">${farmerOrderSubtotal.toFixed(2)}</span>
+                    <span className="earnings-val">${Number(farmerOrderSubtotal).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

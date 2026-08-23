@@ -122,7 +122,7 @@ export const ProductDetail = () => {
 
           <div className="detail-price-stock-box">
             <div className="detail-price">
-              <span className="price-val">${product.price.toFixed(2)}</span>
+              <span className="price-val">${Number(product.price).toFixed(2)}</span>
               <span className="price-unit">/ {product.unit}</span>
             </div>
 

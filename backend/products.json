@@ -1,0 +1,892 @@
+[
+  {
+    "idProduct": "0Y0vxSigCwrJ3o1Btva8",
+    "name": "Jagung",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/jagung.png?alt=media&token=495ec939-0977-44e5-9c46-b22fed8b1eb0",
+    "price": "Rp8.000",
+    "description": "Jagung berbentuk bulir-bulir besar dengan warna kuning. Memiliki tekstur yang renyah dan rasa yang manis.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "0f7oIXKx4539WvLvkGzw",
+    "name": "Belimbing",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/belimbing.png?alt=media&token=a843b653-9f41-44a0-a38f-84dfcaa76db9",
+    "price": "Rp34.000",
+    "description": "Belimbing berbentuk bulat memanjang dengan lima sudut. Berwarna hijau saat mentah dan berubah menjadi kuning saat matang. Memiliki rasa yang manis asam.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "21uQDFNzwrxHdfET59op",
+    "name": "Jeruk bali",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/jeruk_bali.png?alt=media&token=3bbbd88e-e41b-4ec4-9f18-1a2494b41f55",
+    "price": "Rp18.000",
+    "description": "Jeruk Bali berbentuk bulat besar dengan kulit berwarna kuning. Memiliki daging buah yang berwarna merah muda dengan rasa yang manis asam.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "29qJV5J2kuR1SmnTYUCQ",
+    "name": "Lada",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/lada.png?alt=media&token=965a38a7-835f-4a8d-a819-03dab805c714",
+    "price": "Rp120.000",
+    "description": "Lada atau Merica berbentuk biji-biji kecil berwarna hitam. Memiliki aroma yang khas dan rasa yang pedas.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "2HJHDRLvOs5r7bxiBvVh",
+    "name": "Jeruk Nipis",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/jeruk_nipis.png?alt=media&token=8a84bde5-d7e9-4dc6-aae5-8284113054b6",
+    "price": "Rp25.500",
+    "description": "Jeruk Nipis berbentuk bulat kecil dengan kulit berwarna hijau. Memiliki daging buah yang berwarna hijau dengan rasa yang sangat asam.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "4VsR9QsmxfRfNQ3kHK9f",
+    "name": "Seledri",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/seledri.png?alt=media&token=e1952c6c-12eb-4c8e-ac77-393eea4ca3b9",
+    "price": "Rp32.000",
+    "description": "Seledri berbentuk daun-daun berwarna hijau. Memiliki tekstur yang renyah dan rasa yang khas.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "4gaLBiq84pJzOXTHZOS3",
+    "name": "Bayam",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/bayam.png?alt=media&token=57c226ab-177d-46c3-b6be-1bd57f71909f",
+    "price": "Rp21.000",
+    "description": "Bayam memiliki daun yang lebar dan berwarna hijau gelap. Memiliki tekstur yang renyah dan rasa yang sedikit pahit.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "5MDASaC4PeJKCWfXwhSA",
+    "name": "Mangga",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/mangga.png?alt=media&token=2f884cb1-43d8-4660-a129-22d31e85014b",
+    "price": "Rp40.000",
+    "description": "Mangga berbentuk buah oval memanjang dengan kulit berwarna hijau, kuning atau oranye. Memiliki daging buah yang lembut dan rasa yang manis.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "7X8kuiKmASilX55aGJSt",
+    "name": "Bawang Putih",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/bawang_putih.png?alt=media&token=77c9347e-2c32-4fad-9ac6-df9e4b8d8520",
+    "price": "Rp28.000",
+    "description": "Bawang putih berbentuk bulat dengan kulit berwarna putih. Memiliki aroma yang tajam dan rasa yang sedikit pedas.",
+    "rate": "4.6",
+    "category": "Non-Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "94tLIeWaScestFTu8brD",
+    "name": "Kayu Manis",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kayu_manis.png?alt=media&token=4f123cdb-26ee-4d5e-b75c-014934b87c90",
+    "price": "Rp100.000",
+    "description": "Kayu Manis berbentuk kulit batang yang kering berwarna coklat. Memiliki aroma yang khas dan rasa yang manis hangat.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "9UOE49pmPkT4WDdbuwgS",
+    "name": "Cabai Hijau",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/cabai_hijau.png?alt=media&token=9035cfe1-689d-4980-9896-5d84c0ba8a7a",
+    "price": "Rp35.000",
+    "description": "Cabai hijau berbentuk panjang dan lancip dengan warna hijau. Memiliki rasa yang pedas dan sedikit manis.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "9lWaZbbVxT5aQXzEw8GD",
+    "name": "Kacang Panjang",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/1718734354615_kacang_panjang.jpg?alt=media",
+    "price": "Rp10.000",
+    "description": "Kacang Panjang",
+    "rate": "4.9",
+    "category": "organik",
+    "type": "sayuran"
+  },
+  {
+    "idProduct": "ACiAcCcb5TfRwMCzVsX9",
+    "name": "Pepaya",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/pepaya.png?alt=media&token=c8647361-5bdd-4765-8182-0439ec56ad48",
+    "price": "Rp10.000",
+    "description": "Pepaya berbentuk buah oval memanjang dengan kulit berwarna hijau kekuningan. Memiliki daging buah yang kenyal dan rasa yang manis.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "ALelFV3eMEV8kRmqoaxq",
+    "name": "Jeruk keprok",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/jeruk_keprok.png?alt=media&token=32d6263c-84ed-40cf-831d-098fa1837e3c",
+    "price": "Rp45.000",
+    "description": "Jeruk Keprok berbentuk bulat dengan kulit berwarna oranye. Memiliki daging buah yang berwarna oranye dengan rasa yang manis.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "AQsxggU8tWGUQltKxul3",
+    "name": "Jahe",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/jahe.png?alt=media&token=c8adb785-b1f5-4184-89b9-dd178499a7b4",
+    "price": "Rp30.000",
+    "description": "Jahe berbentuk rimpang dengan warna kuning kecoklatan. Memiliki aroma yang kuat dan rasa yang hangat sedikit pedas.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "Aq2J0b5s6LQFgOwfGIaK",
+    "name": "Selada",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/selada.png?alt=media&token=41bf203c-27cf-459d-9d2b-c6d51048fabd",
+    "price": "Rp32.000",
+    "description": "Selada berbentuk daun berwarna hijau segar. Memiliki tekstur yang renyah dan rasa yang segar.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "AzargAqi7f7fs4px8Yce",
+    "name": "Anggur",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/anggur.png?alt=media&token=eba36786-b9d7-4351-abb9-53663c3d9cea",
+    "price": "Rp19.000",
+    "description": "Buah anggur berwarna ungu gelap dengan kulit yang tipis. Memiliki rasa manis yang segar dan memberi sensasi berbeda saat dinikmati.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "B8zG83ZDYBRabkNYc3v2",
+    "name": "Asparagus",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/asparagus.png?alt=media&token=8c4d7fd2-ec4f-46b2-90e0-79b38f53ddbc",
+    "price": "Rp35.000",
+    "description": "Asparagus merupakan sayuran dengan batang yang tebal dan ujung yang melancip. Memiliki tekstur yang renyah dan rasa yang sedikit tawar.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "BRySla72CetL62ZEelh6",
+    "name": "Plum",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/plum.png?alt=media&token=8e31fde6-1c04-4dc0-b748-ded139bbd480",
+    "price": "Rp35.000",
+    "description": "Plum berbentuk buah bulat dengan kulit berwarna ungu tua atau merah. Memiliki daging buah yang lembut dan rasa yang manis asam.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "DoFwx8C1IgBNWuikVloR",
+    "name": "Delima",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/delima.png?alt=media&token=e11113be-f816-4ff5-98b6-7cb8afa05592",
+    "price": "Rp50.000",
+    "description": "Delima berbentuk bulat dengan warna merah. Memiliki daging buah yang berwarna merah dan rasa yang manis asam.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "F7xWTQz6SdiOLXoasCRg",
+    "name": "Jeruk",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/jeruk.png?alt=media&token=05360100-4b8b-4275-9ce1-e9ae576ec020",
+    "price": "Rp35.000",
+    "description": "Jeruk berbentuk bulat dengan kulit berwarna oranye. Memiliki daging buah yang berwarna oranye dengan rasa yang asam manis.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "GMk545Z64GV10Zt0ti37",
+    "name": "Cengkih",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/cengkih.png?alt=media&token=a93264b9-0c67-459d-9586-bb5132f02dfa",
+    "price": "Rp170.000",
+    "description": "Cengkih berbentuk kuncup bunga berwarna coklat. Memiliki aroma yang khas dan rasa yang sedikit pedas.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "H4oiNrmJlSniPPkvzRih",
+    "name": "Kubis",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kubis.png?alt=media&token=1fd95bbe-993c-4c8f-9818-06fbc54d4e63",
+    "price": "Rp14.000",
+    "description": "Kubis berbentuk bulat dengan daun-daun berwarna hijau pucat. Memiliki tekstur yang renyah dan rasa yang segar.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "HDcOIH6iA8LVbvm8ImkD",
+    "name": "Kacang Polong",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kacang_polong.png?alt=media&token=14291efe-48e9-4fd5-b759-70cada8bf240",
+    "price": "Rp35.000",
+    "description": "Kacang Polong berbentuk polong yang berisi biji berwarna hijau. Memiliki tekstur yang lembut dan rasa yang manis.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "I4HbPx1XAvSztoJkppby",
+    "name": "Daun Bawang",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/daun_bawang.png?alt=media&token=e68340ac-782f-4df1-932e-90ea86179f6e",
+    "price": "Rp32.000",
+    "description": "Daun bawang berbentuk panjang dan ramping dengan warna hijau. Memiliki aroma yang khas dan rasa yang sedikit pedas.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "J4cDU840ugq4aFrCaBL8",
+    "name": "Almon",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/almon.png?alt=media&token=f8b3df33-2a25-4262-8278-c268618bbd98",
+    "price": "Rp35.000",
+    "description": "Buah almon segar dengan lapisan kulit yang berwarna cokelat dan isi yang berwarna putih susu. Memiliki rasa yang kaya akan minyak dan sedikit manis.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "J9oy5FiLnUPDkxIGcwx0",
+    "name": "Kangkung",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kangkung.png?alt=media&token=080bca6c-0f79-40a4-aba2-73ebfedf8ae7",
+    "price": "Rp10.000",
+    "description": "Kangkung berbentuk daun berwarna hijau. Memiliki tekstur yang renyah dan rasa yang segar.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "JMSLQ4lMozMcsskadrfC",
+    "name": "Sawi Hijau",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/sawi_hijau.png?alt=media&token=c92b0439-ec20-4e13-8457-3f12f3e737ba",
+    "price": "Rp11.000",
+    "description": "Sawi Hijau berbentuk daun berwarna hijau segar. Memiliki tekstur yang renyah dan rasa yang segar.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "JjLnhM6RrDC94puBBSsn",
+    "name": "Daun Salam",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/daun_salam.png?alt=media&token=198282f8-31f3-4b0a-9805-322e5a584c4d",
+    "price": "Rp20.000",
+    "description": "Daun salam berbentuk bulat telur dan berwarna hijau tua. Memiliki aroma yang khas dan rasa yang sedikit pahit.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "K6UMfG4E5M1N8fPTPFeX",
+    "name": "Kecambah",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kecambah.png?alt=media&token=6b3ab28e-cb28-4bc6-85d5-68e6a718519b",
+    "price": "Rp32.000",
+    "description": "Kecambah berbentuk tunas-tunas yang berwarna putih kekuningan. Memiliki tekstur yang renyah dan rasa yang segar.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "KTRR9i8UWDHPtYpnL8ZQ",
+    "name": "Blewah",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/blewah.png?alt=media&token=6b419034-614c-4c01-9cb7-cb4dad0d066c",
+    "price": "Rp25.000",
+    "description": "Blewah berbentuk bulat dan berwarna hijau muda. Memiliki daging buah yang berwarna kuning krem dan rasa yang manis.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "LCZP4oqdIcv17QosekHp",
+    "name": "Kubis Brussel",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kubis_brussel.png?alt=media&token=79348ea3-2909-4b67-9d0a-b5ed645b3f08",
+    "price": "Rp10.000",
+    "description": "Kubis Brussel berbentuk kuntum-kuntum kecil berwarna hijau tua. Memiliki tekstur yang renyah dan rasa yang sedikit pahit.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "LKHmah6zqw6KSJngRejw",
+    "name": "Wijen",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/wijen.png?alt=media&token=d0fc7eab-200b-4e3b-9a20-ae70263531e2",
+    "price": "Rp65.000",
+    "description": "Wijen berbentuk biji kecil berwarna putih atau hitam. Memiliki rasa yang khas dan digunakan sebagai bumbu atau bahan makanan.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "LnowsuFwErS4SDqppPgO",
+    "name": "Masako",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/1718709503474_favicon.png?alt=media",
+    "price": "2000",
+    "description": "Bumbu Masak",
+    "rate": "4",
+    "category": "non-organik",
+    "type": "bumbu dapur"
+  },
+  {
+    "idProduct": "M9z3rAQLsnUbX8cB5avn",
+    "name": "Ubi Jalar",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/ubi_jalar.png?alt=media&token=a86fe9fe-a32c-4be1-a288-22ac99a8b18e",
+    "price": "Rp17.000",
+    "description": "Ubi Jalar berbentuk umbi panjang dengan kulit berwarna merah atau ungu. Memiliki daging umbi yang lembut dan rasa yang manis.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "O1OpWmPMutDDkht1bS4f",
+    "name": "Jintan",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/jintan.png?alt=media&token=e450397a-656f-4d62-af95-131ba90d948f",
+    "price": "Rp100.000",
+    "description": "Jintan berbentuk biji kecil dengan warna coklat kehitaman. Memiliki aroma yang khas dan rasa yang sedikit pahit.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "O1r39qYXxgxVM2QeP4hG",
+    "name": "Kacang Tanah",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kacang_tanah.png?alt=media&token=de15c489-50c9-41d0-986d-a9390355f73f",
+    "price": "Rp28.500",
+    "description": "Kacang Tanah berbentuk polong yang berisi biji berwarna merah kecoklatan. Memiliki rasa yang gurih dan tekstur yang renyah.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "O2EzkfFHns9r7Pejx7SV",
+    "name": "Kunyit",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kunyit.png?alt=media&token=741f1074-b56c-426a-b4df-b68290fa282c",
+    "price": "Rp10.000",
+    "description": "Kunyit berbentuk rimpang berwarna kuning oranye. Memiliki aroma yang khas dan rasa yang sedikit pahit.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "OswTrWVnxJTDmEZf99YX",
+    "name": "Pir",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/pir.png?alt=media&token=097e0d81-903c-4c80-a9e2-c4091bd97e0a",
+    "price": "Rp28.000",
+    "description": "Pir berbentuk buah bulat memanjang dengan kulit berwarna hijau atau kuning. Memiliki daging buah yang renyah dan rasa yang manis.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "P8H5dFSC5Jvj7W1hrRBo",
+    "name": "Cabai Rawit",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/cabai_rawit.png?alt=media&token=097685b8-cee4-467c-b145-5e0171307542",
+    "price": "Rp42.000",
+    "description": "Cabai rawit berbentuk kecil dan lancip dengan warna merah. Memiliki rasa yang sangat pedas.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "R5tgATwwbXwBCeZq7HBW",
+    "name": "Kacang Panjang",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/1718733684179_kacang_panjang.jpg?alt=media",
+    "price": "Rp10.000",
+    "description": "Kacang Panjang",
+    "rate": "4.8",
+    "category": "organik",
+    "type": "sayuran"
+  },
+  {
+    "idProduct": "SDcQxUBeKgC57j8S2OyM",
+    "name": "Paprika",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/paprika.png?alt=media&token=e5057efc-0da0-4d20-904c-b456dc3a83b3",
+    "price": "Rp45.000",
+    "description": "Paprika berbentuk buah bell berwarna hijau, merah atau kuning. Memiliki tekstur yang renyah dan rasa yang sedikit manis.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "SbslWeyNssKCSWYXDvTm",
+    "name": "Tauge",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/tauge.png?alt=media&token=b6f17eed-7c5c-4a22-aab8-a67252260434",
+    "price": "Rp15.000",
+    "description": "Tauge berbentuk kecambah berwarna putih. Memiliki tekstur yang renyah dan rasa yang segar.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "Tjd1wKjupsqtIfUnoH6R",
+    "name": "Wortel",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/wortel.png?alt=media&token=46680c8c-e7cd-446a-892e-9fcb002fb508",
+    "price": "Rp14.000",
+    "description": "Wortel berbentuk umbi panjang dengan kulit berwarna oranye. Memiliki daging umbi yang renyah dan rasa yang manis.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "UOzdyheHpAk8gGjwOrzD",
+    "name": "Lengkuas",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/lengkuas.png?alt=media&token=7d4ff021-a7f4-4120-9c3a-7f88d21e077e",
+    "price": "Rp15.000",
+    "description": "Lengkuas berbentuk rimpang berwarna putih kekuningan. Memiliki aroma yang khas dan rasa yang sedikit pedas.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "Uw1b9tFxaP51CtRIpSG4",
+    "name": "Sawi Putih",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/sawi_putih.png?alt=media&token=85fc1389-03a3-42a2-8bbb-f3e44a22beff",
+    "price": "Rp10.000",
+    "description": "Sawi Putih berbentuk daun berwarna hijau pucat. Memiliki tekstur yang renyah dan rasa yang segar.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "Vhfr5E09CRJJiH2CJUB8",
+    "name": "Kencur",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kencur.png?alt=media&token=998646d6-e206-49f9-ad33-ca8777e677a9",
+    "price": "Rp25.000",
+    "description": "Kencur berbentuk rimpang berwarna putih kekuningan. Memiliki aroma yang khas dan rasa yang sedikit pahit.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "W02DKM5uNwuawS9jNr4I",
+    "name": "Pisang",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/pisang.png?alt=media&token=8cd8190f-8666-4906-8136-0b8ec1ee0b89",
+    "price": "Rp12.500",
+    "description": "Pisang berbentuk buah memanjang dengan kulit berwarna hijau, kuning atau merah. Memiliki daging buah yang lembut dan rasa yang manis.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "WR3BE5QW45BIiH9guDIr",
+    "name": "Singkong",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/singkong.png?alt=media&token=49c554db-3045-45ef-af8d-197a5b52de71",
+    "price": "Rp7.500",
+    "description": "Singkong berbentuk umbi panjang dengan kulit berwarna coklat. Memiliki daging umbi yang putih dan tekstur yang lembut.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "X7nk53BPfFW1QOgnbsET",
+    "name": "Lobak",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/lobak.png?alt=media&token=e18fce1a-2a06-47b8-a51b-d976ac60c276",
+    "price": "Rp24.000",
+    "description": "Lobak berbentuk silindris memanjang dengan kulit berwarna putih. Memiliki tekstur yang renyah dan rasa yang segar.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "XIAMBqjYno5WvNb05RVt",
+    "name": "Apel",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/apel.png?alt=media&token=361d8353-033f-470d-9dbb-ced95ba533fb",
+    "price": "Rp38.000",
+    "description": "Buah apel dengan beragam warna mulai dari hijau, merah, hingga kuning. Memiliki tekstur yang renyah dan rasa yang manis asam.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "YOgwVqzizQOsjnzc7fsF",
+    "name": "Jamur",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/jamur.png?alt=media&token=a43a69db-2cb2-422b-a5f9-645e579ff173",
+    "price": "Rp106.000",
+    "description": "Jamur berbentuk tudung dengan warna putih dan abu-abu. Memiliki tekstur yang kenyal dan rasa yang gurih.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "ZMlRJIU7z9nFmNp2Jg1k",
+    "name": "Bit",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/bit.png?alt=media&token=a0f69edc-32e9-42c0-988f-5215c391756e",
+    "price": "Rp35.000",
+    "description": "Bit berbentuk bulat dan berwarna merah keunguan. Memiliki tekstur yang padat dan rasa yang sedikit manis.",
+    "rate": "4.4",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "cEdth4VasUK7PvMkvDNo",
+    "name": "Labu Siam",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/labu_siam.png?alt=media&token=1aa086ef-c1ec-4d2c-9258-c3d1ef2fdbe3",
+    "price": "Rp12.000",
+    "description": "Labu Siam berbentuk bulat lonjong dengan kulit berwarna hijau muda. Memiliki daging buah berwarna putih dan rasa yang segar.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "cwvKrbI7iapjsmcp8wZu",
+    "name": "Kelapa",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kelapa.png?alt=media&token=66401421-2175-4bf1-a80d-b4a42e8678f7",
+    "price": "Rp12.000",
+    "description": "Kelapa berbentuk bulat dengan kulit berwarna coklat. Memiliki daging buah yang berwarna putih dan rasa yang manis.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "eKhpYqprvqKxcu1uW32I",
+    "name": "Labu Manis",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/labu_manis.png?alt=media&token=5145808e-97c8-44bc-8722-ea439afdb88d",
+    "price": "Rp30.000",
+    "description": "Labu Manis berbentuk lonjong dengan kulit berwarna kuning. Memiliki daging buah berwarna oranye dan rasa yang sangat manis.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "ezkyqUHGPkocTtVeHUFo",
+    "name": "Kentang",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kentang.png?alt=media&token=80a4a9bc-3ec0-4bb0-8145-3bace8017003",
+    "price": "Rp27.000",
+    "description": "Kentang berbentuk umbi berwarna coklat. Memiliki tekstur yang padat dan rasa yang netral.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "f02ZO3e29sa8Ms0MN2Xm",
+    "name": "Ara",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/ara.png?alt=media&token=0e641983-f18a-4739-9eb3-13c3a27183cd",
+    "price": "Rp35.000",
+    "description": "Buah ara memiliki bentuk yang unik menyerupai jantung. Berwarna hijau saat mentah dan berubah menjadi ungu kehitaman saat matang. Memiliki rasa manis yang lembut.",
+    "rate": "4.3",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "f0jDEdEU2VBo5EmMAF1e",
+    "name": "test",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/1718765243851_FarmFresh.png?alt=media",
+    "price": "2000",
+    "description": "test",
+    "rate": "4",
+    "category": "organik",
+    "type": "buah"
+  },
+  {
+    "idProduct": "fwU2XJyoOe14mrj78ckr",
+    "name": "Pakcoy",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/pakcoy.png?alt=media&token=dc3b1768-1036-4a51-84bf-e4bc19f606e1",
+    "price": "Rp15.000",
+    "description": "Pakcoy berbentuk daun-daun berwarna hijau cerah. Memiliki tekstur yang renyah dan rasa yang segar.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "g1cDdyjussF9xyaKKDVV",
+    "name": "Aprikot",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/aprikot.png?alt=media&token=76f9edf7-da3d-4d98-9e1e-26d2fd65f56b",
+    "price": "Rp30.000",
+    "description": "Buah aprikot berwarna orange kekuningan dengan tekstur yang lembut. Memiliki rasa manis dan sedikit asam yang segar.",
+    "rate": "4.4",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "h6EwcXSXahDixhTVxP5X",
+    "name": "Timun",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/timun.png?alt=media&token=1ce015d3-0aa7-4bb0-829f-ae1c3d26540d",
+    "price": "Rp10.000",
+    "description": "Timun berbentuk buah memanjang dengan kulit berwarna hijau muda. Memiliki tekstur yang renyah dan rasa yang segar.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "kgYvbWh8APLtaCAh03ew",
+    "name": "Jeruk Purut",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/jeruk_purut.png?alt=media&token=cdbf31da-d177-4ab8-8e36-276a077e32dd",
+    "price": "Rp35.000",
+    "description": "Jeruk Purut berbentuk bulat kecil dengan kulit berwarna hijau. Memiliki daging buah yang berwarna hijau dengan aroma yang khas.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "kxGDKsoCNWIM7tbOxDHP",
+    "name": "Bawang Merah",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/bawang_merah.png?alt=media&token=3c3f74b0-698a-4369-aac8-764a1624f1a3",
+    "price": "Rp40.000",
+    "description": "Bawang merah berbentuk bulat lonjong dengan kulit berwarna merah keunguan. Memiliki aroma yang kuat dan rasa yang sedikit pedas.",
+    "rate": "4.7",
+    "category": "Non-Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "lNxVdomwe5gKT1q0USFk",
+    "name": "Lemon",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/lemon.png?alt=media&token=7fe1ca79-8708-4c83-a172-fe71e672dad8",
+    "price": "Rp17.000",
+    "description": "Lemon berbentuk buah oval berwarna kuning. Memiliki kulit yang halus dan rasa yang asam segar.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "ll2uavRzakWZE88ebBWm",
+    "name": "Semangka",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/semangka.png?alt=media&token=79c7be8d-92d3-442b-b95e-a0afa5949b3e",
+    "price": "Rp44.000",
+    "description": "Semangka berbentuk buah bulat besar dengan kulit berwarna hijau gelap. Memiliki daging buah yang renyah dan rasa yang manis.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "mUxcdViAm56eg3cCjecC",
+    "name": "Buncis",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/buncis.png?alt=media&token=2815af52-fdb7-4fdb-a363-9b17a6ead195",
+    "price": "Rp19.000",
+    "description": "Buncis berbentuk panjang dan ramping dengan warna hijau. Memiliki tekstur yang renyah dan rasa yang segar.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "nHEW2o2jyxlT2dOkyHRm",
+    "name": "Stroberi",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/stroberi.png?alt=media&token=7ea963e0-bc5c-4b55-be45-69f9c504cbbc",
+    "price": "Rp60.000",
+    "description": "Stroberi berbentuk buah kecil berwarna merah. Memiliki tekstur yang lembut dan rasa yang manis.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "pv7tmcFHlqI4ZpWpuiYr",
+    "name": "Ceri",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/ceri.png?alt=media&token=6c7c3aee-bd6a-478b-a56c-237776516732",
+    "price": "Rp75.000",
+    "description": "Ceri berbentuk bulat kecil dengan warna merah. Memiliki rasa yang manis asam dan tekstur yang lembut.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "qLNyPy0GGVEbRyJvMp75",
+    "name": "Durian",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/durian.png?alt=media&token=e88f29c1-be72-45d4-bfae-452bf913e2d7",
+    "price": "Rp50.000",
+    "description": "Durian berbentuk bulat dengan kulit berduri berwarna kuning kehijauan. Memiliki daging buah berwarna kuning dengan rasa yang manis dan beraroma khas.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "rj4PR3DIQJMBdv4X6V7n",
+    "name": "Brokoli",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/brokoli.png?alt=media&token=77b72767-11c8-42a1-a1a2-4c79a16741eb",
+    "price": "Rp60.000",
+    "description": "Brokoli memiliki bentuk bunga kecil-kecil yang berwarna hijau. Memiliki tekstur yang renyah dan rasa yang sedikit pahit.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "s2lfHgvj4MmGaiOOLBnt",
+    "name": "Alpukat",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/alpukat.png?alt=media&token=3ac3b990-3543-48e8-95fb-7b26008df6a9",
+    "price": "Rp25.000",
+    "description": "Buah alpukat berbentuk lonjong dengan kulit berwarna hijau gelap. Memiliki daging buah yang lembut, berlemak, dan memiliki rasa yang kaya.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "s2uS9e5ce4OJ8ShR5yww",
+    "name": "Artichoke",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/artichoke.png?alt=media&token=597c3e4a-edaa-4632-bf88-f1ea4bbc8069",
+    "price": "Rp40.000",
+    "description": "Artichoke merupakan bunga yang dapat dimakan. Memiliki tekstur yang tebal dan renyah dengan rasa yang unik, sedikit tawar, dan sedikit manis.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "sUvZaHQEKza3716SBwrP",
+    "name": "Daun Pandan",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/daun_pandan.png?alt=media&token=42c37f75-b835-478b-8354-ae563a76c680",
+    "price": "Rp25.000",
+    "description": "Daun pandan berbentuk panjang dan lancip dengan warna hijau. Memiliki aroma yang harum dan rasa yang sedikit manis.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "tI3Vadi258IhyaGfSAuz",
+    "name": "Kenari",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kenari.png?alt=media&token=5a10d5ed-06ae-4cf9-ab83-c83683130ba2",
+    "price": "Rp28.000",
+    "description": "Kenari berbentuk biji berwarna coklat. Memiliki rasa yang gurih dan tekstur yang renyah.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "tZjz10nheygKx33yrtdn",
+    "name": "Bluberi",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/bluberi.png?alt=media&token=fe99d902-3efb-4de1-b69c-d9f1b9f585f1",
+    "price": "Rp80.000",
+    "description": "Bluberi berbentuk bulat kecil dengan warna biru tua. Memiliki rasa yang manis sedikit asam dan tekstur yang lembut.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "tbnBl5lrA3z4HbMvQnSq",
+    "name": "Kiwi",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kiwi.png?alt=media&token=483553d0-a3e6-4b16-9e64-d9142823bb67",
+    "price": "Rp65.000",
+    "description": "Kiwi berbentuk buah oval berwarna coklat kehijauan dengan bintik-bintik putih. Memiliki tekstur yang kenyal dan rasa yang manis asam.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "uHYrEV8fK7S2J2sDeTS6",
+    "name": "Bawang Bombay",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/bawang_bombay.png?alt=media&token=f121251c-7240-452e-b834-94a068f5c9f9",
+    "price": "Rp20.000",
+    "description": "Bawang bombay memiliki bentuk yang bulat dan berwarna putih kecokelatan. Memiliki rasa yang sedikit manis dan segar.",
+    "rate": "4.4",
+    "category": "Non-Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "uwStIfTjsmg3CIdPrX8r",
+    "name": "Nanas",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/nanas.png?alt=media&token=b621eddd-b25d-4ee4-bd33-8c5d3de1a5ce",
+    "price": "Rp10.000",
+    "description": "Nanas berbentuk buah bulat memanjang dengan kulit berwarna kuning kecoklatan. Memiliki daging buah yang renyah dan rasa yang asam manis.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "vZmD1d2BLpVHD6oIxW4F",
+    "name": "Serai",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/serai.png?alt=media&token=9aee9746-b6f5-4934-aaa5-c8dac1a7749f",
+    "price": "Rp9.500",
+    "description": "Serai berbentuk batang berwarna hijau dengan ujung putih. Memiliki aroma yang khas dan digunakan sebagai bumbu masakan.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "wFpicrThqSelB0jzgYfI",
+    "name": "Kembang Kol",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/kembang_kol.png?alt=media&token=e377f86c-335a-43df-8b81-30a616d49649",
+    "price": "Rp20.000",
+    "description": "Kembang Kol berbentuk bunga berwarna putih. Memiliki tekstur yang renyah dan rasa yang gurih.",
+    "rate": "4.6",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "wTjt8AIYuRMRGc1XmmOc",
+    "name": "Asam Jawa",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/asam_jawa.png?alt=media&token=cb5cbab6-6e1a-4166-9d5b-f349606bf9fb",
+    "price": "Rp25.000",
+    "description": "Buah asam jawa memiliki bentuk yang lonjong dan berwarna cokelat kehitaman. Memiliki rasa yang asam dan sedikit manis yang segar.",
+    "rate": "4.5",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "wxfD0UxyezmzgEyscT9s",
+    "name": "Pala",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/pala.png?alt=media&token=e6bcfaa4-8881-4d4d-81e6-9e0ab14e2344",
+    "price": "Rp170.000",
+    "description": "Pala berbentuk buah bulat dengan kulit berwarna coklat kehijauan. Memiliki daging buah berwarna kuning kecoklatan dan rasa yang khas.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "xIUGipAd8KDcXtSAzvlE",
+    "name": "Cabai Merah",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/cabai_merah.png?alt=media&token=df508ed4-e761-4322-99c4-8692a27b8f04",
+    "price": "Rp50.000",
+    "description": "Cabai merah berbentuk panjang dan lancip dengan warna merah. Memiliki rasa yang pedas dan sedikit manis.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "xce2Ay4RIElOH6Wta6x1",
+    "name": "Cranberry",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/cranberry.png?alt=media&token=87b5fc40-e26c-4280-8f67-e87efc3070a7",
+    "price": "Rp90.000",
+    "description": "Cranberry berbentuk bulat kecil dengan warna merah tua. Memiliki rasa yang asam dan tekstur yang kenyal.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "zACsFevD3LKy8ta7ps6q",
+    "name": "Melon",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/melon.png?alt=media&token=ca089d61-a4d3-4435-93a6-0a7797bd5cb4",
+    "price": "Rp15.000",
+    "description": "Melon berbentuk bulat dengan kulit berwarna hijau atau kuning. Memiliki daging buah yang lembut dan rasa yang manis segar.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Buah"
+  },
+  {
+    "idProduct": "zVwiGC1Ieunln4CXA6XA",
+    "name": "Ketumbar",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/ketumbar.png?alt=media&token=048361a0-9017-4a6f-85d3-71065da040b2",
+    "price": "Rp31.000",
+    "description": "Ketumbar berbentuk biji berwarna coklat. Memiliki aroma yang khas dan rasa yang sedikit pahit.",
+    "rate": "4.8",
+    "category": "Organik",
+    "type": "Bumbu Dapur"
+  },
+  {
+    "idProduct": "zdOEiErfyL9anyBKZvNe",
+    "name": "Tomat",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/tomat.png?alt=media&token=d49154aa-3c21-45e4-8a2c-0b2c686fea53",
+    "price": "Rp30.000",
+    "description": "Tomat berbentuk buah bulat dengan kulit berwarna merah. Memiliki daging buah yang lembut dan rasa yang asam manis.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Sayuran"
+  },
+  {
+    "idProduct": "zrzb38FuMKl6PYi1rSND",
+    "name": "Terung",
+    "image": "https://firebasestorage.googleapis.com/v0/b/farm-fresh-d8e1b.appspot.com/o/terung.png?alt=media&token=bab33115-027e-47e9-8812-6ba922bcb52d",
+    "price": "Rp15.000",
+    "description": "Terung berbentuk buah lonjong dengan kulit berwarna ungu kehitaman. Memiliki daging buah yang lembut dan rasa yang agak pahit.",
+    "rate": "4.7",
+    "category": "Organik",
+    "type": "Sayuran"
+  }
+]

@@ -44,7 +44,7 @@ export const AdminDashboard = () => {
   
   const platformGMV = orders
     .filter((o) => o.status !== 'Cancelled')
-    .reduce((sum, o) => sum + o.totalAmount, 0);
+    .reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
 
   return (
     <div className="admin-dashboard-page" id="admin-hub-container">
@@ -181,7 +181,7 @@ export const AdminDashboard = () => {
                       <td><strong>#{order.id}</strong></td>
                       <td>{order.customerName}</td>
                       <td className="protocol-code">{order.paymentMethod || 'x402'}</td>
-                      <td><strong>${order.totalAmount.toFixed(2)}</strong></td>
+                      <td><strong>${Number(order.totalAmount || 0).toFixed(2)}</strong></td>
                       <td>
                         <span className="payment-verified-badge">
                           {order.paymentStatus === 'Paid' || order.paymentStatus === 'paid' ? 'Verified' : order.paymentStatus}

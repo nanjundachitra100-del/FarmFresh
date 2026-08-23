@@ -192,7 +192,7 @@ export const Cart = () => {
                     <h4 className="cart-item-name">
                       <Link to={`/products/${item.id}`}>{item.name}</Link>
                     </h4>
-                    <span className="cart-item-price-unit">${item.price.toFixed(2)} / {item.unit}</span>
+                    <span className="cart-item-price-unit">${Number(item.price).toFixed(2)} / {item.unit}</span>
                   </div>
 
                   <div className="cart-item-actions-row">
@@ -213,7 +213,7 @@ export const Cart = () => {
                     </div>
 
                     <div className="cart-item-total-price">
-                      ${(item.price * item.cartQuantity).toFixed(2)}
+                      ${(Number(item.price) * item.cartQuantity).toFixed(2)}
                     </div>
 
                     <button 
@@ -237,7 +237,7 @@ export const Cart = () => {
             <div className="summary-details">
               <div className="summary-row">
                 <span>Subtotal</span>
-                <span>${cartTotal.toFixed(2)}</span>
+                <span>${Number(cartTotal).toFixed(2)}</span>
               </div>
               <div className="summary-row">
                 <span>Delivery Fee</span>
@@ -245,7 +245,7 @@ export const Cart = () => {
               </div>
               <div className="summary-row total-row">
                 <span>Total Amount</span>
-                <span>${cartTotal.toFixed(2)}</span>
+                <span>${Number(cartTotal).toFixed(2)}</span>
               </div>
             </div>
 

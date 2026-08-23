@@ -28,10 +28,9 @@ export const FarmerDashboard = () => {
   const totalEarnings = farmerOrders
     .filter((o) => o.status !== 'Cancelled')
     .reduce((sum, order) => {
-      // Sum only items belonging to this farmer
       const farmerItemsSum = order.items
         .filter((item) => farmerProductIds.includes(item.productId))
-        .reduce((s, item) => s + item.price * item.quantity, 0);
+        .reduce((s, item) => s + Number(item.price || 0) * Number(item.quantity || 0), 0);
       return sum + farmerItemsSum;
     }, 0);
 
@@ -126,7 +125,7 @@ export const FarmerDashboard = () => {
             <div className="orders-summary-list-dash">
               {recentOrders.map((order) => {
                 const farmerItems = order.items.filter((item) => farmerProductIds.includes(item.productId));
-                const orderTotalForFarmer = farmerItems.reduce((s, i) => s + i.price * i.quantity, 0);
+                const orderTotalForFarmer = farmerItems.reduce((s, i) => s + Number(i.price || 0) * Number(i.quantity || 0), 0);
 
                 return (
                   <div key={order.id} className="order-row-dash">
@@ -146,7 +145,7 @@ export const FarmerDashboard = () => {
                     </div>
 
                     <div className="order-row-footer-dash">
-                      <span className="order-row-amount">${orderTotalForFarmer.toFixed(2)}</span>
+                      <span className="order-row-amount">${Number(orderTotalForFarmer).toFixed(2)}</span>
                       <span className={`status-badge-mini ${order.status.toLowerCase().replace(/\s+/g, '-')}`}>
                         {order.status}
                       </span>

@@ -51,7 +51,7 @@ export const ProductCard = ({ product }) => {
 
         <div className="card-footer-layout">
           <div className="price-tag-card">
-            <span className="price-amount">${price.toFixed(2)}</span>
+            <span className="price-amount">${Number(price).toFixed(2)}</span>
             <span className="price-unit">/ {unit}</span>
           </div>
 

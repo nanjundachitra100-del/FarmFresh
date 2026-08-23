@@ -1,0 +1,15 @@
+[33mca65eeb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfinal-combined[m[33m, [m[1;31morigin/final-combined[m[33m)[m Complete AI assistant and M2M delivery integration
+[33m1b926a1[m Fix frontend production build
+[33m92fe966[m Configure backend Vercel routing
+[33mfbf9c7b[m Fix products API and update frontend product loading
+[33m1a6a427[m Save working x402 order payment flow
+[33mb6e6ea3[m Merge feature changes into final-combined
+[33ma556ae9[m[33m ([m[1;31morigin/friend-payment[m[33m, [m[1;32mfriend-payment[m[33m)[m Save current x402 payment and delivery changes
+[33m636bdd4[m[33m ([m[1;31morigin/feature/order-status[m[33m, [m[1;32mfeature/order-status[m[33m)[m Add authentication and update dashboards
+[33m8471b10[m[33m ([m[1;32mcheckpoint/x402-before-payment[m[33m)[m chore: preserve Pera wallet changes
+[33m208bd47[m WIP: x402 payment integration
+[33m9389809[m WIP: x402 Algorand payment integration
+[33mae2db2b[m[33m ([m[1;31morigin/supabase-setup[m[33m)[m refactor: centralize demo farmer IDs
+[33m7cd8338[m[33m ([m[1;31morigin/checkpoint/x402-before-payment[m[33m)[m WIP: x402 Algorand payment integration
+[33mb801cea[m Complete Milestone 2 product management and image upload
+[33mfebdfde[m[33m ([m[1;32morders[m[33m)[m Fix Add to Cart functionality
