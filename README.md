@@ -235,10 +235,20 @@ Delivery
 **FarmFresh — Autonomous AI-Powered Farmer Marketplace**
 
 Platform connecting farmers, customers, and AI agents through an agent-ready agricultural marketplace.
+## Local Development
+
+**Frontend:**  
+http://localhost:5173/
+
+**Backend:**  
+http://localhost:5000/
+
+**Backend Health Check:**  
+http://localhost:5000/health
 
 ### Live Application
 
-https://farm-fresh-lime.vercel.app/
+https://farm-fresh-13b2.vercel.app/
 
 ### Repository
 
