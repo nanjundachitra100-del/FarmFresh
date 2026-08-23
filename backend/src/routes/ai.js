@@ -9,33 +9,47 @@ function parseWithRegex(text) {
   let maxBudget = null;
 
   // 1. Parse budget: e.g., "under 300", "budget 300", "max 300", "₹300", "$300"
-  const budgetRegex = /(?:under|budget|max|limit|less than|within|₹|\$)\s*(\d+)/i;
+  //    Only match if a digit immediately follows the currency/keyword marker.
+  const budgetRegex = /(?:under|budget|max|limit|less than|within|₹|\$)\s*(\d+(?:\.\d+)?)/i;
   const budgetMatch = text.match(budgetRegex);
   if (budgetMatch) {
     maxBudget = parseFloat(budgetMatch[1]);
   }
 
-  // 2. Parse items: e.g. "5 kg tomatoes", "2 kg tomatoes and 1 kg onions", "apples"
-  const parts = text.split(/(?:and|plus|,|\+)/gi);
+  // 2. Parse items: e.g. "5 kg tomatoes", "I want 5 kg tomatoes", "buy 2 apples"
+  //    Split on conjunctions first.
+  const parts = text.split(/(?:\band\b|\bplus\b|,|\+)/gi);
+
+  // Intent words to strip from the start of each part before parsing quantity/unit/product.
+  const intentWordRe = /^(?:i\s+(?:want|need|would\s+like)|buy|get(?:\s+me)?|order|give\s+me|add|please\s+(?:add|get|buy)?)\s+/i;
+
   for (const part of parts) {
-    const trimmed = part.trim();
-    if (!trimmed) continue;
-    
-    const itemRegex = /^\s*(\d+(?:\.\d+)?)\s*(kg|lbs|lb|dozen|jar|jars|pack|packs|g|oz)?\s+(.+)$/i;
-    const match = trimmed.match(itemRegex);
+    // Remove budget clause so it doesn't contaminate product name
+    const withoutBudget = part.replace(/(?:under|budget|max|limit|less than|within|₹|\$)\s*\d+(?:\.\d+)?/gi, '').trim();
+    if (!withoutBudget) continue;
+
+    // Strip leading intent words
+    const cleaned = withoutBudget.replace(intentWordRe, '').trim();
+    if (!cleaned) continue;
+
+    // Try to match: <quantity> [unit] <product name>
+    const itemRegex = /^(\d+(?:\.\d+)?)\s*(kg|lbs|lb|dozen|jar|jars|pack|packs|g|oz|unit|units)?\s+(.+)$/i;
+    const match = cleaned.match(itemRegex);
     if (match) {
-      items.push({
-        product: match[3].trim().toLowerCase(),
-        quantity: parseFloat(match[1]),
-        unit: match[2] ? match[2].trim().toLowerCase() : ''
-      });
-    } else {
-      let cleanProd = trimmed
-        .replace(/(?:under|budget|max|limit|less than|within|₹|\$)\s*\d+/gi, '')
-        .trim();
-      if (cleanProd) {
+      const productName = match[3].trim().toLowerCase();
+      // Skip empty or obviously garbage product names
+      if (productName) {
         items.push({
-          product: cleanProd.toLowerCase(),
+          product: productName,
+          quantity: parseFloat(match[1]),
+          unit: match[2] ? match[2].trim().toLowerCase() : ''
+        });
+      }
+    } else {
+      // No leading number — treat whole cleaned string as a product search with qty=1
+      if (cleaned) {
+        items.push({
+          product: cleaned.toLowerCase(),
           quantity: 1,
           unit: ''
         });

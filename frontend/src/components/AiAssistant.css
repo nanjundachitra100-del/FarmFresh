@@ -1,0 +1,412 @@
+.ai-assistant-container {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  margin-bottom: 32px;
+  border-left: 5px solid #10b981; /* Premium organic green accent */
+  transition: all 0.3s ease;
+}
+
+.ai-assistant-container:hover {
+  box-shadow: 0 6px 24px rgba(16, 185, 129, 0.08);
+}
+
+.ai-assistant-header {
+  margin-bottom: 20px;
+}
+
+.ai-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ai-icon-bg {
+  background: #ecfdf5;
+  color: #10b981;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-sparkles-icon {
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+    color: #059669;
+  }
+}
+
+.ai-assistant-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.ai-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.ai-input-form {
+  margin-bottom: 16px;
+}
+
+.ai-input-wrapper {
+  display: flex;
+  gap: 12px;
+}
+
+.ai-chat-input {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  color: #334155;
+  outline: none;
+  background-color: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.ai-chat-input:focus {
+  border-color: #10b981;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.ai-submit-btn {
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 0 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.ai-submit-btn:hover:not(:disabled) {
+  background: #059669;
+}
+
+.ai-submit-btn:disabled {
+  background: #cbd5e1;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.ai-error-banner {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+/* Results Panel */
+.ai-result-panel {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ai-response-message {
+  font-size: 15px;
+  color: #334155;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.ai-response-message p {
+  margin: 0;
+  white-space: pre-line;
+}
+
+/* Intent Info */
+.ai-intent-details {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.intent-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.intent-tag {
+  margin-left: auto;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+}
+
+.intent-grid {
+  font-size: 13px;
+  color: #334155;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.intent-item-tag {
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 6px;
+  font-weight: 500;
+}
+
+.intent-budget-tag {
+  background: #fef3c7;
+  color: #d97706;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* M2M box */
+.ai-m2m-status-box {
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.m2m-paid {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.m2m-payment_required {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.m2m-error {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+.m2m-status-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.m2m-status-info {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.m2m-status-info strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.m2m-status-info p {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.m2m-details, .m2m-instructions {
+  font-family: monospace;
+  background: rgba(0, 0, 0, 0.04);
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 8px !important;
+  font-size: 11px;
+}
+
+.text-green {
+  color: #10b981;
+}
+
+.text-orange {
+  color: #f59e0b;
+}
+
+.text-red {
+  color: #ef4444;
+}
+
+/* Products Recommendation Grid */
+.ai-products-section h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 12px 0;
+}
+
+.ai-products-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.ai-product-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  padding: 12px;
+  gap: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.ai-product-card:hover {
+  border-color: #10b981;
+}
+
+.ai-prod-img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.ai-prod-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ai-prod-info h5 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 2px 0;
+}
+
+.ai-prod-farmer {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: auto;
+}
+
+.ai-prod-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.ai-price {
+  font-weight: 700;
+  color: #10b981;
+  font-size: 15px;
+}
+
+.ai-add-cart-btn {
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.ai-add-cart-btn:hover {
+  background: #059669;
+}
+
+.ai-role-badge {
+  font-size: 11px;
+  color: #ef4444;
+  background: #fef2f2;
+  border: 1px dashed #fca5a5;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.ai-stock-tag {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.ai-no-products {
+  text-align: center;
+  padding: 16px;
+  color: #64748b;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.spinner-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

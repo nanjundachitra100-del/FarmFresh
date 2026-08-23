@@ -1,85 +1,99 @@
+require('dotenv').config();
+
 const { x402Client, x402HTTPClient } = require('@x402/core/client');
 const { ExactAvmScheme } = require('@x402/avm/exact/client');
-const { ALGORAND_TESTNET_CAIP2, getTransactionId, decodeSignedTransaction } = require('@x402/avm');
+const {
+  ALGORAND_TESTNET_CAIP2,
+  getTransactionId
+} = require('@x402/avm');
 const algosdk = require('algosdk');
 
-/**
- * Derives the Algorand transaction ID from a base64-encoded signed transaction.
- * Returns null if derivation fails.
- */
 function extractTxId(base64SignedTxn) {
   if (!base64SignedTxn) return null;
+
   try {
     const bytes = Buffer.from(base64SignedTxn, 'base64');
     return getTransactionId(new Uint8Array(bytes));
   } catch (err) {
-    console.warn('[m2mClient] Could not extract txID:', err.message);
+    console.warn(
+      '[m2mClient] Could not extract txID:',
+      err.message
+    );
     return null;
   }
 }
 
-/**
- * Decodes a base64 payment-required header.
- */
-function decodePaymentRequiredHeader(headerVal) {
-  if (!headerVal) return null;
+function decodePaymentRequiredHeader(headerValue) {
+  if (!headerValue) return null;
+
   try {
-    return JSON.parse(Buffer.from(headerVal, 'base64').toString('utf8'));
+    return JSON.parse(
+      Buffer.from(headerValue, 'base64').toString('utf8')
+    );
   } catch (err) {
-    console.error('[m2mClient] Failed to decode payment-required header:', err.message);
+    console.error(
+      '[m2mClient] Failed to decode payment-required header:',
+      err.message
+    );
     return null;
   }
 }
 
-/**
- * Returns the human-readable USDC amount from a payment requirements object.
- * amount field is in micro-USDC (6 decimals), asset 10458941 = testnet USDC.
- */
 function formatUsdcAmount(requirements) {
   try {
     const accepts = requirements?.accepts || [];
     const req = accepts[0];
+
     if (!req) return null;
+
     const microAmount = BigInt(req.amount);
-    const dollars = Number(microAmount) / 1_000_000;
-    return `${dollars.toFixed(2)} USDC`;
+    const usdc = Number(microAmount) / 1_000_000;
+
+    return `${usdc.toFixed(2)} USDC`;
   } catch {
     return null;
   }
 }
 
-/**
- * Automates requesting the protected M2M delivery-optimizer endpoint via x402.
- *
- * Flow:
- *   1. POST /api/m2m/delivery-optimizer (no payment header) → expect 402
- *   2. Decode PAYMENT-REQUIRED header from the 402 response
- *   3. Build + sign Algorand Testnet USDC transaction using M2M_ALGORAND_MNEMONIC
- *   4. Retry the POST with PAYMENT-SIGNATURE header
- *   5. Extract Algorand transaction ID from the signed payment group
- *   6. Return structured result to the AI router
- *
- * Security: M2M_ALGORAND_MNEMONIC is read ONLY from backend env. Never exposed to frontend.
- */
 async function callDeliveryOptimizer(items = []) {
   const port = process.env.PORT || 5000;
-  const baseUrl = process.env.BACKEND_URL || `http://localhost:${port}`;
-  const url = `${baseUrl}/api/m2m/delivery-optimizer`;
 
-  console.log(`[m2mClient] Requesting M2M delivery optimization: ${url}`);
+  const baseUrl =
+    process.env.BACKEND_URL ||
+    `http://localhost:${port}`;
+
+  const url =
+    `${baseUrl}/api/m2m/delivery-optimizer`;
+
+  console.log(
+    '[m2mClient] Requesting M2M delivery optimization:',
+    url
+  );
 
   try {
-    // ── 1. Initial unauthenticated request ──────────────────────────────────
+    // ---------------------------------------------------------
+    // STEP 1: Initial request
+    // ---------------------------------------------------------
+
     const initialResponse = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({ items })
     });
 
     if (initialResponse.status !== 402) {
-      // Endpoint responded without requiring payment
-      const data = await initialResponse.json();
-      console.log(`[m2mClient] M2M responded ${initialResponse.status} without 402`);
+      const data = await initialResponse
+        .json()
+        .catch(() => ({}));
+
+      console.log(
+        '[m2mClient] M2M responded',
+        initialResponse.status,
+        'without 402'
+      );
+
       return {
         success: initialResponse.ok,
         status: initialResponse.status,
@@ -88,135 +102,331 @@ async function callDeliveryOptimizer(items = []) {
       };
     }
 
-    // ── 2. Got 402 — decode payment requirements ────────────────────────────
-    console.log('[m2mClient] 402 Payment Required received from M2M service.');
+    console.log(
+      '[m2mClient] 402 Payment Required received from M2M service.'
+    );
 
-    const reqHeader =
-      initialResponse.headers.get('payment-required') ||
-      initialResponse.headers.get('PAYMENT-REQUIRED');
+    // ---------------------------------------------------------
+    // STEP 2: Read PAYMENT-REQUIRED header
+    // ---------------------------------------------------------
 
-    if (!reqHeader) {
-      throw new Error('M2M service returned 402 but no PAYMENT-REQUIRED header was found.');
+    const paymentRequiredHeader =
+      initialResponse.headers.get('payment-required');
+
+    if (!paymentRequiredHeader) {
+      throw new Error(
+        '402 response did not contain PAYMENT-REQUIRED header.'
+      );
     }
 
-    const decodedRequirements = decodePaymentRequiredHeader(reqHeader);
-    const amountLabel = formatUsdcAmount(decodedRequirements) || 'unknown amount';
+    const requirements =
+      decodePaymentRequiredHeader(paymentRequiredHeader);
 
-    console.log(`[m2mClient] Payment required: ${amountLabel}`);
+    if (!requirements) {
+      throw new Error(
+        'Could not decode PAYMENT-REQUIRED header.'
+      );
+    }
 
-    // ── 3. Check mnemonic ───────────────────────────────────────────────────
-    const mnemonic = process.env.M2M_ALGORAND_MNEMONIC;
+    console.log(
+      '[m2mClient] Payment requirements:',
+      JSON.stringify(requirements, null, 2)
+    );
+
+    const amountLabel =
+      formatUsdcAmount(requirements) ||
+      'unknown amount';
+
+    console.log(
+      '[m2mClient] Payment required:',
+      amountLabel
+    );
+
+    // ---------------------------------------------------------
+    // STEP 3: Load M2M wallet
+    // ---------------------------------------------------------
+
+    const mnemonic =
+      process.env.M2M_ALGORAND_MNEMONIC;
+
     if (!mnemonic || !mnemonic.trim()) {
-      console.log('[m2mClient] M2M_ALGORAND_MNEMONIC not configured — cannot pay automatically.');
       return {
         success: false,
         status: 402,
         m2mStatus: 'payment_required',
         paymentAmount: amountLabel,
-        message: 'M2M payment required but M2M_ALGORAND_MNEMONIC is not configured in backend environment.',
-        requirements: decodedRequirements
+        message:
+          'M2M_ALGORAND_MNEMONIC is not configured.',
+        requirements
       };
     }
 
-    // ── 4. Build signer from mnemonic ───────────────────────────────────────
     let account;
+
     try {
-      account = algosdk.mnemonicToSecretKey(mnemonic.trim());
+      account =
+        algosdk.mnemonicToSecretKey(
+          mnemonic.trim()
+        );
     } catch (err) {
-      throw new Error(`Invalid M2M_ALGORAND_MNEMONIC: ${err.message}`);
+      throw new Error(
+        'Invalid M2M_ALGORAND_MNEMONIC: ' +
+        err.message
+      );
     }
 
-    const senderAddress = account.addr.toString();
-    console.log(`[m2mClient] Signing M2M payment using address: ${senderAddress}`);
+    const senderAddress =
+      account.addr.toString();
+
+    console.log(
+      '[m2mClient] Signing M2M payment using address:',
+      senderAddress
+    );
+
+    // ---------------------------------------------------------
+    // STEP 4: x402 signer
+    // ---------------------------------------------------------
 
     const signer = {
       address: senderAddress,
-      signTransactions: async (encodedTxns, clientIndexes) => {
-        console.log(`[m2mClient] Signing ${encodedTxns.length} txn(s), indexes: ${JSON.stringify(clientIndexes)}`);
-        return encodedTxns.map((txnBytes, i) => {
-          if (clientIndexes.includes(i)) {
-            const txn = algosdk.decodeUnsignedTransaction(txnBytes);
+
+      signTransactions: async (
+        encodedTxns,
+        clientIndexes
+      ) => {
+        console.log(
+          '[m2mClient] Signing ' +
+          encodedTxns.length +
+          ' txn(s), indexes: ' +
+          JSON.stringify(clientIndexes)
+        );
+
+        return encodedTxns.map(
+          (txnBytes, index) => {
+            if (!clientIndexes.includes(index)) {
+              return null;
+            }
+
+            const txn =
+              algosdk.decodeUnsignedTransaction(
+                txnBytes
+              );
+
             return txn.signTxn(account.sk);
           }
-          return null;
-        });
+        );
       }
     };
 
-    // ── 5. Create x402 client and payment payload ───────────────────────────
-    const client = new x402Client()
-      .register(ALGORAND_TESTNET_CAIP2, new ExactAvmScheme(signer));
+    // ---------------------------------------------------------
+    // STEP 5: Create x402 client
+    // ---------------------------------------------------------
 
-    const httpClient = new x402HTTPClient(client);
+    const client =
+      new x402Client().register(
+        ALGORAND_TESTNET_CAIP2,
+        new ExactAvmScheme(signer)
+      );
 
-    // Read the payment-required body (some servers also include it in the body)
+    const httpClient =
+      new x402HTTPClient(client);
+
+    // ---------------------------------------------------------
+    // STEP 6: Parse payment requirements
+    // ---------------------------------------------------------
+
     let bodyData = null;
+
     try {
-      const text = await initialResponse.clone().text();
-      if (text) bodyData = JSON.parse(text);
-    } catch { /* ignore */ }
+      const text =
+        await initialResponse.clone().text();
 
-    const getHeader = (name) => initialResponse.headers.get(name);
-    const paymentRequired = httpClient.getPaymentRequiredResponse(getHeader, bodyData);
+      if (text) {
+        bodyData = JSON.parse(text);
+      }
+    } catch {
+      // Ignore body parsing errors.
+    }
 
-    console.log('[m2mClient] Creating payment payload...');
-    const paymentPayload = await client.createPaymentPayload(paymentRequired);
+    const getHeader = (name) =>
+      initialResponse.headers.get(name);
 
-    // ── 6. Encode the payment header ────────────────────────────────────────
-    const paymentHeaders = httpClient.encodePaymentSignatureHeader(paymentPayload);
+    const paymentRequired =
+      httpClient.getPaymentRequiredResponse(
+        getHeader,
+        bodyData
+      );
 
-    console.log('[m2mClient] Payment signed. Retrying with PAYMENT-SIGNATURE...');
+    console.log(
+      '[m2mClient] Creating payment payload...'
+    );
 
-    // ── 7. Retry request with payment proof ─────────────────────────────────
+    const paymentPayload =
+      await client.createPaymentPayload(
+        paymentRequired
+      );
+
+    // ---------------------------------------------------------
+    // STEP 7: Encode PAYMENT-SIGNATURE
+    // ---------------------------------------------------------
+
+    const paymentHeaders =
+      httpClient.encodePaymentSignatureHeader(
+        paymentPayload
+      );
+
+    console.log(
+      '[m2mClient] Payment signed. Retrying with PAYMENT-SIGNATURE...'
+    );
+
+    // ---------------------------------------------------------
+    // STEP 8: Retry request with payment
+    // ---------------------------------------------------------
+
     const retryResponse = await fetch(url, {
       method: 'POST',
+
       headers: {
         'Content-Type': 'application/json',
         ...paymentHeaders
       },
+
       body: JSON.stringify({ items })
     });
 
-    const retryData = await retryResponse.json().catch(() => ({}));
-    console.log(`[m2mClient] Retry responded HTTP ${retryResponse.status}`);
+    // IMPORTANT:
+    // Read response as text so we can see errors.
 
-    // ── 8. Process payment result ────────────────────────────────────────────
-    await httpClient.processPaymentResult(
-      paymentPayload,
-      (name) => retryResponse.headers.get(name),
+    const retryText =
+      await retryResponse.text();
+
+    let retryData = {};
+
+    try {
+      retryData =
+        retryText
+          ? JSON.parse(retryText)
+          : {};
+    } catch {
+      retryData = {
+        raw: retryText
+      };
+    }
+
+    console.log(
+      '[m2mClient] Retry responded HTTP',
       retryResponse.status
     );
 
-    // ── 9. Extract Algorand transaction ID ───────────────────────────────────
-    let transactionId = null;
+    console.log(
+      '[m2mClient] Retry response body:',
+      retryText || '(empty)'
+    );
+
+    console.log(
+      '[m2mClient] PAYMENT-RESPONSE:',
+      retryResponse.headers.get(
+        'payment-response'
+      )
+    );
+
+    console.log(
+      '[m2mClient] X-PAYMENT-RESPONSE:',
+      retryResponse.headers.get(
+        'x-payment-response'
+      )
+    );
+
+    // ---------------------------------------------------------
+    // STEP 9: Process payment result
+    // ---------------------------------------------------------
+
     try {
-      const { payload } = paymentPayload;
-      const signedTxnBase64 = payload?.paymentGroup?.[payload.paymentIndex];
-      transactionId = extractTxId(signedTxnBase64);
+      await httpClient.processPaymentResult(
+        paymentPayload,
+
+        (name) =>
+          retryResponse.headers.get(name),
+
+        retryResponse.status
+      );
+    } catch (err) {
+      console.warn(
+        '[m2mClient] Payment result processing warning:',
+        err.message
+      );
+    }
+
+    // ---------------------------------------------------------
+    // STEP 10: Extract Algorand transaction ID
+    // ---------------------------------------------------------
+
+    let transactionId = null;
+
+    try {
+      const payload =
+        paymentPayload.payload;
+
+      const signedTxn =
+        payload?.paymentGroup?.[
+          payload.paymentIndex
+        ];
+
+      transactionId =
+        extractTxId(signedTxn);
+
       if (transactionId) {
-        console.log(`[m2mClient] Algorand Testnet txID: ${transactionId}`);
+        console.log(
+          '[m2mClient] Algorand Testnet txID:',
+          transactionId
+        );
       }
     } catch (err) {
-      console.warn('[m2mClient] Could not extract txID:', err.message);
+      console.warn(
+        '[m2mClient] Could not extract txID:',
+        err.message
+      );
     }
+
+    // ---------------------------------------------------------
+    // STEP 11: Return result
+    // ---------------------------------------------------------
 
     return {
       success: retryResponse.ok,
+
       status: retryResponse.status,
-      m2mStatus: retryResponse.ok ? 'paid' : 'error',
+
+      m2mStatus:
+        retryResponse.ok
+          ? 'paid'
+          : 'error',
+
       paymentAmount: amountLabel,
+
       transactionId,
+
       data: retryData
     };
 
   } catch (err) {
-    console.error('[m2mClient] Error during M2M x402 flow:', err.message);
+    console.error(
+      '[m2mClient] Error during M2M x402 flow:',
+      err.message
+    );
+
     return {
       success: false,
+
       m2mStatus: 'error',
-      message: err.message || 'M2M payment flow failed.'
+
+      message:
+        err.message ||
+        'M2M payment flow failed.'
     };
   }
 }
 
-module.exports = { callDeliveryOptimizer };
+module.exports = {
+  callDeliveryOptimizer
+};

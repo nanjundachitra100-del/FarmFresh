@@ -169,7 +169,7 @@ const m2mX402Routes = {
       network: ALGORAND_NETWORK,
       payTo: M2M_RECEIVER_ADDRESS,
       price: M2M_SERVICE_PRICE,
-      maxTimeoutSeconds: 120
+      maxTimeoutSeconds: 300
     },
     description: 'FarmFresh M2M Delivery Optimizer — requires USDC payment on Algorand Testnet',
     mimeType: 'application/json'

@@ -42,19 +42,6 @@ function createX402Routes(avmAddress, algorandNetwork) {
       },
       description: 'FarmFresh order checkout requires Algorand Testnet USDC payment via x402',
       mimeType: 'application/json'
-    },
-    'POST /api/m2m/delivery-optimizer': {
-      accepts: {
-        scheme: 'exact',
-        network: algorandNetwork,
-        payTo: avmAddress,
-        price: async () => {
-          return '0.10'; // 0.10 USDC per optimization check
-        },
-        maxTimeoutSeconds: 300
-      },
-      description: 'FarmFresh M2M delivery optimization requires Algorand Testnet USDC payment via x402',
-      mimeType: 'application/json'
     }
   };
 }
