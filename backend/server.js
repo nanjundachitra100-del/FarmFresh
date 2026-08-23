@@ -23,6 +23,7 @@ const {
 const productsRouter = require('./src/routes/products');
 const { createX402Routes } = require('./src/config/x402Routes');
 const ordersRouter = require('./src/routes/orders');
+const aiRouter = require('./src/routes/ai');
 
 const app = express();
 
@@ -128,6 +129,12 @@ app.use(
   productsRouter
 );
 
+// Public AI Assistant Chat Router
+app.use(
+  '/api/ai',
+  aiRouter
+);
+
 // Official x402 middleware (apply before orders router so x402-protected
 // endpoints such as POST /api/orders are handled, but products GET remains public)
 app.use(
@@ -141,6 +148,51 @@ app.use(
   '/api/orders',
   ordersRouter
 );
+
+// ---------------------------------------------------------------------------
+// M2M Delivery Optimizer — x402-protected endpoint
+// The paymentMiddleware already handles verification/settlement before this
+// handler runs. Only requests that have passed payment verification reach here.
+// ---------------------------------------------------------------------------
+
+// Determine M2M receiver address: prefer M2M_RECEIVER_ADDRESS, fall back to AVM_ADDRESS
+const M2M_RECEIVER_ADDRESS = process.env.M2M_RECEIVER_ADDRESS || AVM_ADDRESS;
+
+// Price for the M2M delivery optimization service (in USD/USDC)
+const M2M_SERVICE_PRICE = process.env.M2M_SERVICE_PRICE || '0.10';
+
+// Register the M2M route with x402 payment protection
+const m2mX402Routes = {
+  'POST /api/m2m/delivery-optimizer': {
+    accepts: {
+      scheme: 'exact',
+      network: ALGORAND_NETWORK,
+      payTo: M2M_RECEIVER_ADDRESS,
+      price: M2M_SERVICE_PRICE,
+      maxTimeoutSeconds: 120
+    },
+    description: 'FarmFresh M2M Delivery Optimizer — requires USDC payment on Algorand Testnet',
+    mimeType: 'application/json'
+  }
+};
+
+app.use(
+  paymentMiddleware(
+    m2mX402Routes,
+    resourceServer
+  )
+);
+
+app.post('/api/m2m/delivery-optimizer', (req, res) => {
+  console.log('[M2M Endpoint] POST /api/m2m/delivery-optimizer — payment verified, serving response.');
+  res.json({
+    success: true,
+    deliveryFee: 2.50,
+    estimatedDays: 1,
+    provider: 'EcoExpress M2M',
+    message: 'Delivery successfully optimized by EcoExpress M2M service.'
+  });
+});
 
 
 // Root endpoint

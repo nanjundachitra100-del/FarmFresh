@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Search, ArrowUpDown, X, AlertCircle, RefreshCw } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { ProductCard } from '../components/ProductCard';
+import { AiAssistant } from '../components/AiAssistant';
 import './BrowseProducts.css';
 
 export const BrowseProducts = () => {
@@ -72,6 +73,9 @@ export const BrowseProducts = () => {
           </button>
         </div>
       )}
+
+      {/* AI Shopping Assistant Panel */}
+      <AiAssistant />
 
       {/* Control panel (Search & filters) */}
       <section className="catalog-control-panel">
