@@ -1,12 +1,12 @@
-# 🌱 FarmFresh — Autonomous AI-Powered Farmer Marketplace
+# FarmFresh — Autonomous AI-Powered Farmer Marketplace
 
-> **An agent-ready agricultural marketplace where AI agents can discover farm products and initiate pay-per-use purchases through x402, with USDC settlement on Algorand.**
+> An agent-ready agricultural marketplace where AI agents can discover farm products and initiate pay-per-use purchases through x402, with USDC settlement on Algorand.
 
-## 🎯 Problem & Solution
+## Problem & Solution
 
 Farmers struggle to reach customers directly, while traditional marketplaces depend on manual purchasing and centralized payment systems.
 
-**FarmFresh** connects **farmers, customers, and AI agents** in one marketplace. The AI agent can understand a user's requirement, discover suitable products, and participate in the purchase workflow.
+**FarmFresh** connects **farmers, customers, and AI agents** in one marketplace. The AI agent can understand a user's requirements, discover suitable products, and participate in the purchase workflow.
 
 ### Core Workflow
 
@@ -32,7 +32,7 @@ Payment Verification
 Order Confirmed
 ```
 
-## 🤖 Why AI Agent?
+## Why AI Agent?
 
 FarmFresh goes beyond a normal AI chatbot.
 
@@ -43,11 +43,11 @@ The AI agent can:
 * Select a product
 * Initiate the purchase workflow
 * Participate in the x402 payment flow
-* Receive payment/order confirmation
+* Receive payment and order confirmation
 
 > **Our AI agent is not just conversational—it participates in the transaction lifecycle.**
 
-## 💳 Why x402 + Algorand?
+## Why x402 + Algorand?
 
 **x402** provides the HTTP-native payment mechanism for pay-per-use transactions.
 
@@ -55,11 +55,11 @@ The AI agent can:
 
 This enables machine-to-machine payments without relying entirely on traditional checkout or subscription systems.
 
-## 🏗️ Architecture
+## Architecture
 
 ```text
                   ┌──────────────┐
-                  │  AI Agent    │
+                  │   AI Agent   │
                   └──────┬───────┘
                          ↓
                   ┌──────────────┐
@@ -88,21 +88,21 @@ This enables machine-to-machine payments without relying entirely on traditional
                          └───────────┘
 ```
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-| Layer            | Technology           |
-| ---------------- | -------------------- |
-| Frontend         | React + Vite         |
-| Backend          | Node.js + Express    |
-| Database & Auth  | Supabase             |
-| AI               | AI Agent Integration |
-| Payment Protocol | x402                 |
-| Facilitator      | GoPlausible          |
-| Blockchain       | Algorand             |
-| Currency         | USDC                 |
-| Wallet           | Pera Wallet          |
+| Layer                     | Technology           |
+| ------------------------- | -------------------- |
+| Frontend                  | React + Vite         |
+| Backend                   | Node.js + Express    |
+| Database & Authentication | Supabase             |
+| AI                        | AI Agent Integration |
+| Payment Protocol          | x402                 |
+| Facilitator               | GoPlausible          |
+| Blockchain                | Algorand             |
+| Currency                  | USDC                 |
+| Wallet                    | Pera Wallet          |
 
-## 🚀 Run Locally
+## Run Locally
 
 ### Backend
 
@@ -122,9 +122,9 @@ npm install
 npm run dev
 ```
 
-Configure the required `.env` variables for **Supabase, Algorand, x402 and frontend API connection** before starting the application.
+Configure the required `.env` variables for **Supabase, Algorand, x402, and the frontend API connection** before starting the application.
 
-## 🧪 How to Test
+## How to Test
 
 1. Open the FarmFresh frontend.
 2. Login as a customer.
@@ -139,7 +139,7 @@ Configure the required `.env` variables for **Supabase, Algorand, x402 and front
 11. Login as a farmer to view the order.
 12. Use the delivery dashboard to manage delivery.
 
-## ⛓️ x402 Transaction Proof
+## x402 Transaction Proof
 
 A real FarmFresh x402 payment was settled on **Algorand Testnet**.
 
@@ -149,44 +149,97 @@ A real FarmFresh x402 payment was settled on **Algorand Testnet**.
 32VMOXZI5EFNLXHK7DEDX2ERORMT2R5YN4EC2GMHVZ43SUOCTVLA
 ```
 
-**View on Lora:**
+**View the transaction on Algorand Testnet:**
 
-[🔗 View Algorand Testnet Transaction](https://lora.algokit.io/testnet/transaction/32VMOXZI5EFNLXHK7DEDX2ERORMT2R5YN4EC2GMHVZ43SUOCTVLA)
+https://lora.algokit.io/testnet/transaction/32VMOXZI5EFNLXHK7DEDX2ERORMT2R5YN4EC2GMHVZ43SUOCTVLA
 
 This provides on-chain evidence of the working payment flow.
 
-## ⭐ USP — What Makes FarmFresh Different?
+## USP — What Makes FarmFresh Different?
 
-Traditional agricultural marketplaces:
+### Traditional Agricultural Marketplace
 
 ```text
-Human → Search → Select → Checkout → Pay
+Human
+  ↓
+Search
+  ↓
+Select
+  ↓
+Checkout
+  ↓
+Pay
 ```
 
-FarmFresh:
+### FarmFresh
 
 ```text
-User → AI Agent → Discover → Decide
-      → x402 Payment → USDC/Algorand → Order
+User
+  ↓
+AI Agent
+  ↓
+Discover
+  ↓
+Decide
+  ↓
+x402 Payment
+  ↓
+USDC / Algorand
+  ↓
+Order
 ```
 
 > **FarmFresh is an agent-ready agricultural marketplace where AI agents can discover real-world farm products and participate in pay-per-use purchases using x402, with USDC settlement on Algorand.**
 
-This combines:
+FarmFresh combines:
 
-**🌾 Agriculture + 🤖 AI Agents + 💳 x402 + ⛓️ Algorand**
+**Agriculture + AI Agents + x402 + Algorand**
 
-## 🔐 Security
+## Security
 
 * Payments are cryptographically authorized.
-* Backend verifies payment before completing protected actions.
+* The backend verifies payment before completing protected actions.
 * Sensitive credentials are stored in environment variables.
 * Payment settlement is recorded on-chain.
 
-## 🎥 Demo Flow
+## Demo Flow
 
-**Problem → FarmFresh Marketplace → AI Agent → Product Discovery → x402 402 Payment → Algorand USDC Settlement → Order → Farmer → Delivery**
+```text
+Problem
+   ↓
+FarmFresh Marketplace
+   ↓
+AI Agent
+   ↓
+Product Discovery
+   ↓
+402 Payment Required
+   ↓
+x402 Payment
+   ↓
+Algorand USDC Settlement
+   ↓
+Order Confirmation
+   ↓
+Farmer
+   ↓
+Delivery
+```
 
-## 🌱 Vision
+## Vision
 
 **FarmFresh turns agricultural commerce into agentic commerce—making AI agents active participants in real-world buying and selling.**
+
+## Project
+
+**FarmFresh — Autonomous AI-Powered Farmer Marketplace**
+
+Platform connecting farmers, customers, and AI agents through an agent-ready agricultural marketplace.
+
+### Live Application
+
+https://farm-fresh-lime.vercel.app/
+
+### Repository
+
+https://github.com/nanjundachitra100-del/FarmFresh
