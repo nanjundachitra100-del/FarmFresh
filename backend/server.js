@@ -72,20 +72,30 @@ if (ALGORAND_NETWORK !== ALGORAND_TESTNET_CAIP2) {
   );
 }
 
-// CORS
+// CORS — build the allowed origins list from CLIENT_ORIGIN env var.
+// On Render, set CLIENT_ORIGIN=https://farm-fresh-13b2.vercel.app
+// Multiple origins can be supplied as comma-separated values.
+const allowedOrigins = new Set([
+  ...CLIENT_ORIGIN.split(',').map(o => o.trim()).filter(Boolean),
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5174',
+  'http://localhost:5175',
+  'http://127.0.0.1:5175',
+  'http://localhost:5177',
+  'http://127.0.0.1:5177'
+]);
+
 app.use(
   cors({
-    origin: [
-      CLIENT_ORIGIN,
-      'http://localhost:5173',
-      'http://127.0.0.1:5173',
-      'http://localhost:5174',
-      'http://127.0.0.1:5174',
-      'http://localhost:5175',
-      'http://127.0.0.1:5175',
-      'http://localhost:5177',
-      'http://127.0.0.1:5177'
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (curl, Postman, server-to-server)
+      if (!origin || allowedOrigins.has(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error('CORS: origin not allowed — ' + origin));
+    },
     credentials: true,
     exposedHeaders: [
       'PAYMENT-RESPONSE',
